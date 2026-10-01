@@ -7,6 +7,8 @@
   "status": "shipped",
   "featured": true,
   "repo": "https://github.com/Austin-Deccentric/naijastay",
+  "live": "https://naijastay-api.onrender.com/",
+  "docs": "https://naijastay-api.onrender.com/docs",
   "stack": ["Python 3.14", "FastAPI", "SQLModel", "PostgreSQL", "Redis", "Alembic", "Docker", "SlowAPI", "APScheduler", "SSE"],
   "highlights": [
     "2,814 LOC across domain modules: rooms, bookings, payments, users, auth",
