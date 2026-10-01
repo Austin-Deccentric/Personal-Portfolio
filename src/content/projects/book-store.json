@@ -1,0 +1,43 @@
+{
+  "title": "Book Store API",
+  "tagline": "Async book store with Docker deployment",
+  "description": "A book store API built with FastAPI, SQLModel (async), and PostgreSQL. Full book CRUD with author foreign-key validation, session-cookie auth, and a production-shaped Docker setup.",
+  "role": "Backend Engineer",
+  "year": "2026",
+  "status": "shipped",
+  "featured": true,
+  "repo": "https://github.com/Austin-Deccentric/Book-Store",
+  "stack": ["Python 3.14", "FastAPI", "SQLModel", "PostgreSQL", "psycopg3", "Docker", "Ruff", "basedpyright"],
+  "highlights": [
+    "Async SQLAlchemy 2 + psycopg3 with greenlet-safe session management",
+    "HttpOnly, SameSite=Lax session cookies with 30-min TTL",
+    "Multi-stage Docker build with healthcheck and persistent volume",
+    "Ruff + basedpyright configured for linting and type checking",
+    "render.yaml for one-click Render deployment",
+    "Domain-focused layout: each feature owns its models and routes"
+  ],
+  "problem": "A book store API needs full CRUD with referential integrity (books must have valid authors), secure auth, and a deployment path that does not require manual server setup.",
+  "constraints": [
+    "Async end-to-end: async engine, async sessions, async endpoints",
+    "Passwords hashed with pwdlib's recommended hasher",
+    "Session cookies must be HttpOnly and SameSite=Lax",
+    "Docker image must be multi-stage and production-sized"
+  ],
+  "architecture": [
+    "app/book and app/user each own model.py and router.py",
+    "Shared ApiResponse envelope in app/schemas.py",
+    "pydantic-settings for env-based configuration",
+    "Two-stage Dockerfile: builder + runtime, with db healthcheck and volume"
+  ],
+  "decisions": [
+    "Chose async SQLAlchemy 2 over sync for I/O-bound API workloads",
+    "Used a shared response envelope so clients get a consistent {status, message, data} shape",
+    "Added render.yaml so the project deploys with one click, trading platform lock-in for speed"
+  ],
+  "next": [
+    "Pagination and filtering on book list",
+    "Search endpoint",
+    "CI pipeline running ruff and basedpyright"
+  ],
+  "order": 3
+}

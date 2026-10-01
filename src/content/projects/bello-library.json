@@ -1,0 +1,13 @@
+{
+  "title": "Bello's Library Window",
+  "tagline": "Library management CLI",
+  "description": "A Python CLI for managing a small library: books, staff, and lending records persisted to JSON.",
+  "role": "Backend Engineer",
+  "year": "2026",
+  "status": "coursework",
+  "featured": false,
+  "repo": "https://github.com/Austin-Deccentric/Bello-s-Library-Window",
+  "stack": ["Python", "JSON"],
+  "highlights": ["CLI-driven workflow", "JSON persistence", "Staff and book records"],
+  "order": 4
+}

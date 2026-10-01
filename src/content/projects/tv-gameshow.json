@@ -1,0 +1,12 @@
+{
+  "title": "TV Gameshow",
+  "tagline": "Gameshow simulator",
+  "description": "A Python gameshow simulator built as a Friday project.",
+  "role": "Backend Engineer",
+  "year": "2026",
+  "status": "coursework",
+  "featured": false,
+  "stack": ["Python"],
+  "highlights": ["Game logic", "Scoring system"],
+  "order": 9
+}

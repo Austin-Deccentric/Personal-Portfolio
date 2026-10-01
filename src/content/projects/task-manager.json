@@ -1,0 +1,13 @@
+{
+  "title": "Task Manager",
+  "tagline": "SQLite-backed task tracker",
+  "description": "A Python task manager with a SQLite backend for creating, tracking, and completing tasks.",
+  "role": "Backend Engineer",
+  "year": "2026",
+  "status": "coursework",
+  "featured": false,
+  "repo": "https://github.com/Austin-Deccentric/Task-Manager",
+  "stack": ["Python", "SQLite"],
+  "highlights": ["SQLite persistence", "Task lifecycle tracking"],
+  "order": 6
+}

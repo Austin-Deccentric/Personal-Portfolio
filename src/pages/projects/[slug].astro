@@ -1,0 +1,181 @@
+---
+import Base from '../../layouts/Base.astro';
+import Panel from '../../components/Panel.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const { title, tagline, description, role, year, status, repo, live, docs, stack, highlights, problem, constraints, architecture, decisions, next } = project.data;
+---
+
+<Base title={`${title} — Chukwu Austin`} description={description}>
+  <article class="case-study">
+    <div class="container">
+      <a href="/projects" class="back-link">cd ..</a>
+
+      <Panel title={title} status={status} meta={`${year} · ${role}`}>
+        <p class="case-tagline">{tagline}</p>
+        <p class="case-desc">{description}</p>
+
+        <div class="case-links">
+          {repo && (
+            <a href={repo} target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+              ./view-source.sh
+            </a>
+          )}
+          {live && (
+            <a href={live} target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+              ./run-demo.sh
+            </a>
+          )}
+          {docs && (
+            <a href={docs} target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+              ./api-docs.sh
+            </a>
+          )}
+        </div>
+
+        <div class="case-stack">
+          {stack.map((tech) => (
+            <span class="tag">{tech}</span>
+          ))}
+        </div>
+      </Panel>
+
+      {highlights.length > 0 && (
+        <section class="case-section reveal">
+          <h2>highlights</h2>
+          <ul>
+            {highlights.map((h) => (
+              <li>{h}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {problem && (
+        <section class="case-section reveal">
+          <h2>problem</h2>
+          <p>{problem}</p>
+        </section>
+      )}
+
+      {constraints.length > 0 && (
+        <section class="case-section reveal">
+          <h2>constraints</h2>
+          <ul>
+            {constraints.map((c) => (
+              <li>{c}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {architecture.length > 0 && (
+        <section class="case-section reveal">
+          <h2>architecture</h2>
+          <ul>
+            {architecture.map((a) => (
+              <li>{a}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {decisions.length > 0 && (
+        <section class="case-section reveal">
+          <h2>decisions</h2>
+          <ul>
+            {decisions.map((d) => (
+              <li>{d}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {next.length > 0 && (
+        <section class="case-section reveal">
+          <h2>todo</h2>
+          <ul>
+            {next.map((n) => (
+              <li>{n}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div class="case-nav">
+        <a href="/projects" class="btn btn-outline">cd ./projects</a>
+        <a href="/contact" class="btn btn-primary">./contact.sh</a>
+      </div>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .case-study {
+    padding: 2rem 0 3rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .back-link:hover {
+    color: var(--green);
+  }
+
+  .case-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .case-tagline {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+  }
+
+  .case-desc {
+    max-width: 620px;
+    margin-bottom: 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .case-links {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .case-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem;
+    margin: 1rem 0 0.25rem;
+  }
+
+  .case-nav {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    .case-tagline {
+      font-size: 1rem;
+    }
+  }
+</style>

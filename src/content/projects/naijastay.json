@@ -1,0 +1,54 @@
+{
+  "title": "NaijaStay",
+  "tagline": "Hotel booking & operations API",
+  "description": "A backend API for managing hotel rooms, guests, staff, bookings, availability, and day-to-day hotel operations. Built around the practical problems of a real hotel: room availability, temporary holds, booking conflicts, staff permissions, check-in/check-out workflows, housekeeping states, caching, rate limiting, and migrations.",
+  "role": "Backend Engineer",
+  "year": "2026",
+  "status": "shipped",
+  "featured": true,
+  "repo": "https://github.com/Austin-Deccentric/naijastay",
+  "stack": ["Python 3.14", "FastAPI", "SQLModel", "PostgreSQL", "Redis", "Alembic", "Docker", "SlowAPI", "APScheduler", "SSE"],
+  "highlights": [
+    "2,814 LOC across domain modules: rooms, bookings, payments, users, auth",
+    "102 automated tests across 13 test files",
+    "4-role RBAC (guest, receptionist, housekeeper, manager) via reusable dependencies",
+    "Pessimistic locking to prevent double-bookings",
+    "Server-side price calculation — client never trusted for totals",
+    "Redis-backed temporary room holds with expiry",
+    "Alembic migrations instead of create_all()",
+    "Docker Compose with healthcheck gating so the API waits for Postgres and Redis",
+    "SSE streaming for room status, APScheduler for background jobs",
+    "Middleware-based request logging and SlowAPI rate limiting"
+  ],
+  "problem": "A hotel booking system has to do more than store a reservation. When a guest searches for a room, the system must determine whether that room is genuinely available for the requested dates — not just whether an is_available flag is set. If a guest temporarily holds a room while completing a booking, another guest must not be able to take the same room during that period. And hotel employees should not all have the same level of access.",
+  "constraints": [
+    "PostgreSQL is the source of truth; Redis is a performance layer, never the authority",
+    "Booking price must be calculated server-side — a client-supplied total is a vulnerability",
+    "Four roles with genuinely different permissions, not one role with if-statements",
+    "Schema changes must be explicit and reproducible across environments",
+    "The API must start only when its dependencies are healthy"
+  ],
+  "architecture": [
+    "Domain-oriented layout: app/domains/{users,rooms,bookings,payments,auth} each own models, schemas, service, and router",
+    "Routers handle HTTP concerns only; business rules live in service layers where they are reusable and independently testable",
+    "Reusable role dependencies enforce authorization instead of duplicating permission checks",
+    "Redis holds are consumed on booking completion or expire naturally",
+    "Alembic migrations manage all schema changes; create_all() is never used in normal operation",
+    "Docker Compose orchestrates API + PostgreSQL + Redis with healthchecks and dependency ordering"
+  ],
+  "decisions": [
+    "Chose pessimistic locking for booking creation — the double-booking window is rare but catastrophic, so correctness beats throughput",
+    "Separated booking status from room-cleaning status: a room is not ready just because the previous booking ended",
+    "Cached read-heavy endpoints only, with invalidation on room or pricing changes — never cached booking operations",
+    "Used SQLModel over raw SQLAlchemy for schema-first models with Pydantic validation, accepting the abstraction cost for development speed",
+    "Centralized logging in middleware so routers stay focused on business logic"
+  ],
+  "next": [
+    "Payment gateway integration (currently a mock provider)",
+    "Email/SMS booking confirmations",
+    "Automated expired-hold cleanup job",
+    "CI/CD pipeline and production observability",
+    "API versioning and a frontend client"
+  ],
+  "order": 1
+}

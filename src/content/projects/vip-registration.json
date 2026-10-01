@@ -1,0 +1,12 @@
+{
+  "title": "VIP Registration",
+  "tagline": "Event registration desk",
+  "description": "A Python CLI for managing VIP event registrations.",
+  "role": "Backend Engineer",
+  "year": "2026",
+  "status": "coursework",
+  "featured": false,
+  "stack": ["Python"],
+  "highlights": ["Registration workflow", "CLI interface"],
+  "order": 8
+}

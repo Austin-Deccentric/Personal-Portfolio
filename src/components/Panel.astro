@@ -1,0 +1,56 @@
+---
+interface Props {
+  title: string;
+  status?: 'shipped' | 'in-progress' | 'coursework';
+  meta?: string;
+  index?: string;
+  href?: string;
+  external?: boolean;
+  reveal?: boolean;
+  scramble?: boolean;
+}
+
+const {
+  title,
+  status,
+  meta,
+  index,
+  href,
+  external,
+  reveal = false,
+  scramble = false,
+} = Astro.props;
+
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag
+  class:list={['panel', { reveal }]}
+  href={href}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
+>
+  <div class="panel-edge panel-edge-top" aria-hidden="true">
+    <span class="panel-corner">╭─[&nbsp;</span>
+    <span class="panel-tag">{[index, status].filter(Boolean).join(' · ') || '···'}&nbsp;</span>
+    <span class="panel-corner">]</span>
+    <span class="panel-fill">────────────────────────────────────────────────────────────</span>
+    <span class="panel-corner">╮</span>
+  </div>
+
+  <div class="panel-body">
+    <div class="panel-head">
+      {status && <span class={`status-dot status-dot--${status}`} aria-hidden="true"></span>}
+      <h3 class="panel-title" data-scramble={scramble ? '' : undefined}>{title}</h3>
+      {meta && <span class="panel-meta">{meta}</span>}
+      {status && <span class="sr-only">({status})</span>}
+    </div>
+    <slot />
+  </div>
+
+  <div class="panel-edge panel-edge-bot" aria-hidden="true">
+    <span class="panel-corner">╰</span>
+    <span class="panel-fill">────────────────────────────────────────────────────────────</span>
+    <span class="panel-corner">╯</span>
+  </div>
+</Tag>

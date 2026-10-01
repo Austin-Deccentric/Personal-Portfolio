@@ -1,0 +1,91 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Contact — Chukwu Austin">
+  <section class="section">
+    <div class="container">
+      <p class="section-label">./contact.sh</p>
+      <h1 class="section-title">Contact</h1>
+      <p class="section-intro">
+        I'm currently open to backend engineering roles. Whether you have an
+        opportunity, a question, or just want to say hi — my inbox is open.
+      </p>
+
+      <div class="contact-grid">
+        <a href="mailto:chukwuaugust0@gmail.com" class="card contact-card">
+          <div class="contact-cmd">$ mail</div>
+          <h3>email</h3>
+          <p class="contact-value">chukwuaugust0@gmail.com</p>
+          <p class="contact-note">best for detailed messages and job opportunities</p>
+        </a>
+
+        <a href="https://github.com/Austin-Deccentric" target="_blank" rel="noopener noreferrer" class="card contact-card">
+          <div class="contact-cmd">$ git remote -v</div>
+          <h3>github</h3>
+          <p class="contact-value">github.com/Austin-Deccentric</p>
+          <p class="contact-note">see my code, contributions, and open source work</p>
+        </a>
+
+        <a href="https://www.linkedin.com/in/augustine-chukwu" target="_blank" rel="noopener noreferrer" class="card contact-card">
+          <div class="contact-cmd">$ cat ./resume</div>
+          <h3>linkedin</h3>
+          <p class="contact-value">linkedin.com/in/augustine-chukwu</p>
+          <p class="contact-note">professional profile and resume</p>
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .section-intro {
+    max-width: 560px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .contact-card {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    padding: 1.25rem;
+  }
+
+  .contact-card:hover {
+    text-decoration: none;
+    border-color: var(--green);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .contact-cmd {
+    font-size: 0.75rem;
+    color: var(--green);
+    margin-bottom: 0.5rem;
+  }
+
+  .contact-card h3 {
+    margin-bottom: 0.2rem;
+    font-size: 0.95rem;
+  }
+
+  .contact-value {
+    font-weight: 600;
+    color: var(--green);
+    font-size: 0.8rem;
+    margin-bottom: 0.4rem;
+    word-break: break-all;
+  }
+
+  .contact-note {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,13 @@
+{
+  "title": "Lagos Route",
+  "tagline": "Route data explorer",
+  "description": "A Python tool for exploring and querying Lagos route data from a JSON dataset.",
+  "role": "Backend Engineer",
+  "year": "2026",
+  "status": "coursework",
+  "featured": false,
+  "repo": "https://github.com/Austin-Deccentric/Lagos-Route",
+  "stack": ["Python", "JSON"],
+  "highlights": ["Route dataset querying", "Regex-based parsing"],
+  "order": 5
+}

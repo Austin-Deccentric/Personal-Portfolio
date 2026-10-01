@@ -1,0 +1,12 @@
+{
+  "title": "Notes App",
+  "tagline": "Note-taking CLI",
+  "description": "A Python CLI for creating and managing notes.",
+  "role": "Backend Engineer",
+  "year": "2026",
+  "status": "coursework",
+  "featured": false,
+  "stack": ["Python"],
+  "highlights": ["CLI interface", "Note CRUD"],
+  "order": 7
+}

@@ -1,0 +1,69 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="404 — No such file or directory">
+  <section class="section">
+    <div class="container">
+      <div class="terminal-block">
+        <div class="terminal-line">
+          <span class="prompt">augustine@enugu</span><span class="prompt-path">:~/portfolio$</span>
+          <span class="terminal-cmd">cat {Astro.url.pathname}</span>
+        </div>
+        <div class="terminal-line terminal-output">
+          cat: {Astro.url.pathname}: No such file or directory
+        </div>
+        <div class="terminal-line">
+          <span class="prompt">augustine@enugu</span><span class="prompt-path">:~/portfolio$</span>
+          <span class="cursor"></span>
+        </div>
+      </div>
+
+      <p class="not-found-hint">
+        exit code 1 — that path doesn't exist. These do:
+      </p>
+
+      <div class="not-found-actions">
+        <a href="/" class="btn btn-primary">cd ~</a>
+        <a href="/projects" class="btn btn-outline">ls ./projects</a>
+        <a href="/contact" class="btn btn-outline">./contact.sh</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .terminal-block {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+
+  .terminal-line {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .terminal-output {
+    color: var(--text-secondary);
+  }
+
+  .terminal-cmd {
+    color: var(--text);
+  }
+
+  .not-found-hint {
+    margin-bottom: 1rem;
+  }
+
+  .not-found-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+</style>

@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+import Panel from '../components/Panel.astro';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const featured = projects.filter((p) => p.data.featured);
+const other = projects.filter((p) => !p.data.featured);
+---
+
+<Base title="Projects — Chukwu Austin">
+  <section class="section">
+    <div class="container">
+      <p class="section-label">ls -la ./projects</p>
+      <h1 class="section-title">All projects</h1>
+      <p class="section-intro">
+        Backend APIs and tools I've built — from a production-shaped hotel booking
+        system to smaller coursework projects.
+      </p>
+
+      <h2 class="group-title reveal">./featured</h2>
+      <div>
+        {
+          featured.map((project, i) => (
+            <Panel
+              title={project.data.title}
+              status={project.data.status}
+              meta={project.data.year}
+              index={String(i + 1).padStart(2, '0')}
+              href={`/projects/${project.id}`}
+              reveal
+              scramble
+            >
+              <p class="panel-tagline">{project.data.tagline}</p>
+              <p class="panel-desc">{project.data.description.slice(0, 140)}...</p>
+              <div class="panel-stack">
+                {project.data.stack.slice(0, 5).map((tech) => (
+                  <span class="tag">{tech}</span>
+                ))}
+                {project.data.stack.length > 5 && (
+                  <span class="tag">+{project.data.stack.length - 5}</span>
+                )}
+              </div>
+            </Panel>
+          ))
+        }
+      </div>
+
+      <h2 class="group-title reveal">./also-built</h2>
+      <div>
+        {
+          other.map((project, i) => (
+            <Panel
+              title={project.data.title}
+              status={project.data.status}
+              index={String(i + 1).padStart(2, '0')}
+              href={project.data.repo ?? `/projects/${project.id}`}
+              external={Boolean(project.data.repo)}
+              reveal
+            >
+              <p class="panel-tagline">{project.data.tagline}</p>
+              <div class="panel-stack">
+                {project.data.stack.slice(0, 3).map((tech) => (
+                  <span class="tag">{tech}</span>
+                ))}
+              </div>
+            </Panel>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .section-intro {
+    max-width: 560px;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+  }
+
+  .group-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 2rem 0 0.75rem;
+    font-family: var(--font-mono);
+  }
+
+  .group-title::before {
+    content: "$ ";
+    color: var(--green);
+  }
+</style>

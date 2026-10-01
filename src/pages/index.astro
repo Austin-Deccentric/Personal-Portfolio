@@ -1,0 +1,279 @@
+---
+import Base from '../layouts/Base.astro';
+import Panel from '../components/Panel.astro';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects'))
+  .filter((p) => p.data.featured)
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base title="Chukwu Austin — Backend Engineer">
+  <section class="hero">
+    <div class="container">
+      <div class="boot" data-boot aria-label="loading log">
+        <div class="boot-line" data-boot-line="0">[+] loading profile …</div>
+        <div class="boot-line" data-boot-line="1">[+] mounting ./projects …</div>
+        <div class="boot-line" data-boot-line="2"><span class="boot-ok">[✓] ready</span></div>
+      </div>
+
+      <div class="terminal-block">
+        <div class="terminal-line">
+          <span class="prompt">augustine@enugu</span><span class="prompt-path">:~/portfolio$</span>
+          <span class="terminal-cmd">whoami</span>
+        </div>
+        <div class="terminal-line terminal-output">
+          backend engineer · enugu, ng
+        </div>
+        <div class="terminal-line">
+          <span class="prompt">augustine@enugu</span><span class="prompt-path">:~/portfolio$</span>
+          <span class="terminal-cmd">cat ./intro.txt</span>
+        </div>
+        <div class="terminal-line terminal-output">
+          I build APIs that don't break at 3AM.
+        </div>
+        <div class="terminal-line terminal-output">
+          FastAPI · PostgreSQL · Docker · Redis
+        </div>
+        <div class="terminal-line terminal-output">
+          currently open to backend roles
+        </div>
+        <div class="terminal-line">
+          <span class="prompt">augustine@enugu</span><span class="prompt-path">:~/portfolio$</span>
+          <span class="cursor"></span>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="/#projects" class="btn btn-primary">./view-projects.sh</a>
+        <a href="/contact" class="btn btn-outline">./contact.sh</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="projects">
+    <div class="container">
+      <p class="section-label reveal">ls -la ./projects</p>
+      <h2 class="section-title reveal">Featured work</h2>
+
+      <div>
+        {
+          projects.map((project, i) => (
+            <Panel
+              title={project.data.title}
+              status={project.data.status}
+              meta={project.data.year}
+              index={String(i + 1).padStart(2, '0')}
+              href={`/projects/${project.id}`}
+              reveal
+              scramble
+            >
+              <p class="panel-tagline">{project.data.tagline}</p>
+              <p class="panel-desc">{project.data.description.slice(0, 120)}...</p>
+              <div class="panel-stack">
+                {project.data.stack.slice(0, 4).map((tech) => (
+                  <span class="tag">{tech}</span>
+                ))}
+                {project.data.stack.length > 4 && (
+                  <span class="tag">+{project.data.stack.length - 4}</span>
+                )}
+              </div>
+            </Panel>
+          ))
+        }
+      </div>
+
+      <a href="/projects" class="btn btn-outline" style="margin-top: 1rem;">
+        ls ./projects/all
+      </a>
+    </div>
+  </section>
+
+  <section class="section" id="stack">
+    <div class="container">
+      <p class="section-label reveal">cat ./stack.txt</p>
+      <h2 class="section-title reveal">Stack</h2>
+
+      <div class="stack-grid">
+        <div class="card reveal">
+          <h3>backend</h3>
+          <div class="stack-tags">
+            <span class="tag">python 3.14</span>
+            <span class="tag">fastapi</span>
+            <span class="tag">sqlmodel</span>
+            <span class="tag">sqlalchemy 2</span>
+            <span class="tag">pydantic</span>
+            <span class="tag">postgresql</span>
+            <span class="tag">redis</span>
+            <span class="tag">alembic</span>
+          </div>
+        </div>
+        <div class="card reveal">
+          <h3>infrastructure</h3>
+          <div class="stack-tags">
+            <span class="tag">docker</span>
+            <span class="tag">docker compose</span>
+            <span class="tag">linux</span>
+            <span class="tag">bash</span>
+            <span class="tag">git</span>
+            <span class="tag">render</span>
+            <span class="tag">netlify</span>
+          </div>
+        </div>
+        <div class="card reveal">
+          <h3>testing & quality</h3>
+          <div class="stack-tags">
+            <span class="tag">pytest</span>
+            <span class="tag">ruff</span>
+            <span class="tag">basedpyright</span>
+            <span class="tag">uv</span>
+          </div>
+        </div>
+        <div class="card reveal">
+          <h3>learning</h3>
+          <div class="stack-tags">
+            <span class="tag">data pipelines</span>
+            <span class="tag">cloud infra</span>
+            <span class="tag">agentic ai</span>
+            <span class="tag">llms</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="container">
+      <p class="section-label reveal">cat ./about.txt</p>
+      <h2 class="section-title reveal">About</h2>
+      <div class="about-content">
+        <p>
+          I'm a backend engineer who cares about the unglamorous parts of building
+          APIs — the parts that keep systems running at 3 AM. Availability checks
+          that mean something. Price calculations the client can't manipulate.
+          Migrations you can actually roll back. Tests that catch the bug before
+          your user does.
+        </p>
+        <p>
+          My capstone project, <a href="/projects/naijastay">NaijaStay</a>, is a
+          hotel booking API that models real operational problems: temporary room
+          holds, double-booking prevention, role-based staff workflows, and a
+          booking lifecycle that doesn't fall apart at the edges.
+        </p>
+        <p>
+          When I'm not writing APIs, I'm breaking and fixing things, debugging
+          late into the night, or lifting weights at the gym.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    (function () {
+      var boot = document.querySelector('[data-boot]');
+      if (!boot) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var lines = Array.from(boot.querySelectorAll('[data-boot-line]'));
+      var texts = lines.map(function (el) { return el.innerHTML; });
+      lines.forEach(function (el) { el.innerHTML = '&nbsp;'; });
+      var li = 0;
+      function typeLine() {
+        if (li >= lines.length) return;
+        var full = texts[li].replace(/<[^>]*>/g, '');
+        var html = texts[li];
+        var isHtml = html !== full;
+        var target = isHtml ? html : full;
+        var ci = 0;
+        var timer = setInterval(function () {
+          ci++;
+          if (isHtml) {
+            lines[li].innerHTML = '<span class="boot-ok">' + full.slice(0, ci) + '</span>';
+          } else {
+            lines[li].textContent = full.slice(0, ci);
+          }
+          if (ci >= full.length) {
+            clearInterval(timer);
+            lines[li].innerHTML = texts[li];
+            li++;
+            setTimeout(typeLine, 220);
+          }
+        }, 18);
+      }
+      setTimeout(typeLine, 300);
+    })();
+  </script>
+</Base>
+
+<style>
+  .hero {
+    padding: 3.5rem 0 3rem;
+  }
+
+  .terminal-block {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+
+  .terminal-line {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .terminal-output {
+    color: var(--text-secondary);
+  }
+
+  .terminal-cmd {
+    color: var(--text);
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .stack-grid h3 {
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    text-transform: lowercase;
+    color: var(--text-muted);
+  }
+
+  .stack-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem;
+  }
+
+  .about-content {
+    max-width: 620px;
+  }
+
+  .about-content p {
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 640px) {
+    .hero {
+      padding: 2.5rem 0 2rem;
+    }
+
+    .terminal-block {
+      padding: 1rem;
+      font-size: 0.8rem;
+    }
+  }
+</style>

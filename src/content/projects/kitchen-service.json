@@ -1,0 +1,44 @@
+{
+  "title": "Iya Ngozi Kitchen",
+  "tagline": "Multi-branch food ordering API",
+  "description": "A FastAPI + SQLModel service for a multi-branch Enugu restaurant: browse the menu per branch, register/sign in, place and track orders — plus staff-only dish and order management, role-gated.",
+  "role": "Backend Engineer",
+  "year": "2026",
+  "status": "shipped",
+  "featured": true,
+  "repo": "https://github.com/Austin-Deccentric/Kitchen-Service",
+  "stack": ["Python 3.14", "FastAPI", "SQLModel", "SQLite", "Argon2", "Pydantic"],
+  "highlights": [
+    "Multi-branch data model: 3 branches, 5 categories, 20 dishes with per-branch prices and availability",
+    "Cookie session auth with Argon2 password hashing via pwdlib",
+    "Role-gated staff routes for dish and order management",
+    "Idempotent seed script — safe to re-run",
+    "Documented ERD in docs/ERD.md",
+    "X-Process-Time middleware for request timing",
+    "Seeded with 10 customers, 3 staff, and 20 orders for realistic testing"
+  ],
+  "problem": "A restaurant with multiple branches needs a menu that differs by location — different dishes, different prices, different availability — while keeping a single ordering and auth system.",
+  "constraints": [
+    "SQLite for zero-infrastructure local development",
+    "All routes under /api/v1 with interactive docs at /docs",
+    "Public menu endpoints must require no auth",
+    "Staff operations must be role-gated"
+  ],
+  "architecture": [
+    "Domain layout: app/public, app/user/{auth,orders}, app/staff, app/utils",
+    "BranchMenu join table models per-branch dish availability and pricing",
+    "Cookie-based sessions with 7-day TTL",
+    "Seed module is idempotent and safe to re-run"
+  ],
+  "decisions": [
+    "Used SQLite to keep the project runnable with a single command, trading production realism for developer experience",
+    "Modeled per-branch pricing explicitly rather than a single global price, because that is how the business actually works",
+    "Kept auth cookie-based rather than JWT for a server-rendered-friendly session model"
+  ],
+  "next": [
+    "PostgreSQL migration for production",
+    "Order status notifications",
+    "Branch-level analytics"
+  ],
+  "order": 2
+}

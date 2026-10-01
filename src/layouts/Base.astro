@@ -1,0 +1,158 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+import '../styles/global.css';
+
+const {
+  title,
+  description = 'Backend engineer building production-shaped APIs with FastAPI and PostgreSQL.',
+  ogImage,
+} = Astro.props;
+
+// Crawlers ignore relative og:image URLs, so resolve against the site.
+// NOTE: `site` in astro.config.mjs must be the real deployed domain
+// for link previews to render.
+const ogImageUrl = ogImage ?? (Astro.site ? new URL('og-image.png', Astro.site).href : undefined);
+
+const path = Astro.url.pathname;
+const isHome = path === '/' || path === '';
+const isProjects = path === '/projects' || path.startsWith('/projects/');
+const isStack = path === '/stack';
+const isContact = path === '/contact';
+
+const segments = path.split('/').filter(Boolean);
+const displayPath = segments.length ? `~/${segments.join('/')}` : '~';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Chukwu Austin — Backend Engineer" />
+    {Astro.url && <meta property="og:url" content={Astro.url.href} />}
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <script is:inline>
+      (function () {
+        const stored = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = stored || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="window-bar" aria-hidden="true">
+      <div class="window-dots">
+        <span class="window-dot window-dot--red"></span>
+        <span class="window-dot window-dot--yellow"></span>
+        <span class="window-dot window-dot--green"></span>
+      </div>
+      <span class="window-path">{displayPath}</span>
+    </div>
+
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
+      <span id="theme-label">[dark]</span>
+    </button>
+
+    <nav class="nav">
+      <div class="container nav-inner">
+        <a href="/" class="nav-brand">~/chukwuaustin</a>
+        <div class="nav-links">
+          <a href="/#projects" class:list={[{ active: isProjects }]}>projects</a>
+          <a href="/#stack" class:list={[{ active: isStack }]}>stack</a>
+          <a href="/contact" class:list={[{ active: isContact }]}>contact</a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <pre class="footer-banner" aria-hidden="true"> ███  █   █  ███  █████  █  █   █
+█   █ █   █ █        █   █  ██  █
+█████ █   █  ███     █   █  █ █ █
+█   █ █   █     █    █   █  █  ██
+█   █  ███  ████     █   █  █   █</pre>
+        <span class="sr-only">Chukwu Austin</span>
+        <div class="footer-inner">
+          <p class="footer-text">exit code 0 · built with astro</p>
+          <div class="footer-links">
+            <a href="https://github.com/Austin-Deccentric" target="_blank" rel="noopener noreferrer">github</a>
+            <a href="https://www.linkedin.com/in/augustine-chukwu" target="_blank" rel="noopener noreferrer">linkedin</a>
+            <a href="mailto:chukwuaugust0@gmail.com">email</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script is:inline>
+      const toggle = document.getElementById('theme-toggle');
+      const label = document.getElementById('theme-label');
+
+      function updateLabel() {
+        const theme = document.documentElement.getAttribute('data-theme');
+        label.textContent = theme === 'dark' ? '[light]' : '[dark]';
+      }
+
+      updateLabel();
+
+      toggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateLabel();
+      });
+
+      (function () {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var GLYPHS = '░▒▓█<>/\\|─═+#*';
+        document.querySelectorAll('[data-scramble]').forEach(function (el) {
+          var original = el.textContent;
+          el.setAttribute('data-original', original);
+          var timer = null;
+          el.closest('a, .panel')?.addEventListener('mouseenter', function () {
+            if (timer) return;
+            var frames = 0;
+            timer = setInterval(function () {
+              frames++;
+              if (frames > 8) {
+                clearInterval(timer);
+                timer = null;
+                el.textContent = original;
+                return;
+              }
+              var out = '';
+              for (var i = 0; i < original.length; i++) {
+                out += original[i] === ' ' ? ' ' : GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+              }
+              el.textContent = out;
+            }, 45);
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
