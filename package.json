@@ -8,10 +8,11 @@
     "start": "astro dev",
     "prebuild": "node scripts/generate-og.mjs",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "npx serve dist",
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
     "astro": "^5.14.0"
   },
   "devDependencies": {
