@@ -9,7 +9,7 @@ import '../styles/global.css';
 
 const {
   title,
-  description = 'Backend engineer building production-shaped APIs with FastAPI and PostgreSQL.',
+  description = 'Full-stack engineer building production-shaped APIs with FastAPI and PostgreSQL, and the Next.js + TypeScript frontends on top of them.',
   ogImage,
 } = Astro.props;
 
@@ -40,7 +40,7 @@ const displayPath = segments.length ? `~/${segments.join('/')}` : '~';
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Chukwu Austin — Backend Engineer" />
+    <meta property="og:site_name" content="Chukwu Austin — Full-Stack Engineer" />
     {Astro.url && <meta property="og:url" content={Astro.url.href} />}
     {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
     <meta name="twitter:card" content="summary_large_image" />
