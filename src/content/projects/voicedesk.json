@@ -1,0 +1,55 @@
+{
+  "title": "VoiceDesk",
+  "tagline": "Voice-note inbox with AI agent assist",
+  "description": "A full-stack voice-note inbox for small Nigerian businesses. Customer voice notes in Pidgin, Yorùbá, Igbo, Hausa or English are transcribed, translated, tagged by intent, and answered with a draft grounded in the business's own approved answers. A human approves every reply before it is sent.",
+  "role": "Full-Stack Engineer",
+  "year": "2026",
+  "status": "shipped",
+  "featured": true,
+  "live": "https://voice-desk-two.vercel.app",
+  "stack": ["FastAPI", "Next.js", "TypeScript", "PostgreSQL", "Tailwind CSS", "shadcn/ui", "SQLModel", "Alembic", "SSE", "Playwright", "Docker", "Bun", "uv"],
+  "highlights": [
+    "~6,100 LOC FastAPI backend and ~6,400 LOC Next.js + TypeScript frontend",
+    "166 pytest tests against real Postgres plus 30 Playwright end-to-end tests with axe accessibility checks",
+    "Idempotent, resumable 4-step pipeline: transcribe → translate → tag intent → draft reply",
+    "Approval gate: sending a reply without an approval record is rejected with HTTP 409",
+    "Postgres job queue with SELECT … FOR UPDATE SKIP LOCKED instead of Redis",
+    "Provider-agnostic STT and LLM adapters (ElevenLabs Scribe v2, any OpenAI-compatible model)",
+    "Live inbox updates over Server-Sent Events",
+    "Public in-browser recording page (MediaRecorder) and tokenised customer status page",
+    "WhatsApp and Telegram channels behind the same pipeline",
+    "Owner/agent roles, rotating refresh tokens, workspace isolation on every query"
+  ],
+  "problem": "Nigerian customers send voice notes instead of typing, often mixing Pidgin, Yorùbá, Igbo, Hausa and English in one sentence. A small business owner getting 80 voice notes a day can't listen to them all, agents don't speak every language, and generic chatbots built for typed English give wrong answers where money or health is involved.",
+  "constraints": [
+    "A human approves every reply — the AI draft is stored separately from the sent reply",
+    "Drafts come only from the business's approved knowledge base; no match means a visible 'needs an agent' flag",
+    "Every pipeline step can fail, and failures must be shown, not hidden",
+    "Retrying a step must never transcribe, translate or bill twice",
+    "Workspaces are isolated, and voice data is handled under NDPA 2023 (consent, retention, no audio in logs)",
+    "Be honest about language quality: languages with high word error rate are labelled beta"
+  ],
+  "architecture": [
+    "Monorepo: api/ (FastAPI, SQLModel, Alembic) and web/ (Next.js Pages Router, TypeScript, Tailwind, shadcn/ui)",
+    "Upload creates the message and its job row in one Postgres transaction, so no job is ever lost or orphaned",
+    "A poll loop inside the API claims jobs safely and runs the pipeline; each step_run is unique on (message_id, step)",
+    "STT and LLM vendors sit behind small Protocol interfaces chosen by env var, with fake providers that count calls for tests",
+    "An in-process SSE broker pushes status changes to the agent inbox in real time",
+    "Next.js API routes keep the rotating refresh token in an HttpOnly, SameSite=Strict cookie; only the 15-minute access token reaches the browser",
+    "Deployed on Vercel (web), Render (API, Docker) and Neon (Postgres), with Cloudinary for audio"
+  ],
+  "decisions": [
+    "Chose a Postgres job table over Redis — the volume is small, idempotency state lives in the DB anyway, and enqueueing in the same transaction removes a class of bugs",
+    "Chose ElevenLabs Scribe v2 over Whisper, which scores above 100% WER on Hausa, Igbo and Yorùbá and has no Pidgin support",
+    "Made every step idempotent and resumable so a retry from the UI resumes at the failed step without repeating paid calls",
+    "Kept vendors behind adapters so a new STT or LLM provider is one class, with no pipeline changes",
+    "Covered cross-boundary flows (browser → Next.js server → API) with Playwright rather than mocking them"
+  ],
+  "next": [
+    "Run the WER research spike on consented local audio and replace vendor figures",
+    "WhatsApp for many businesses via Embedded Signup",
+    "Spoken replies in the customer's language (TTS)",
+    "Usage-based billing by minutes processed and agent seats"
+  ],
+  "order": 0
+}

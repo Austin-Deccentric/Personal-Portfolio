@@ -109,6 +109,17 @@ const projects = (await getCollection('projects'))
           </div>
         </div>
         <div class="card reveal">
+          <h3>frontend</h3>
+          <div class="stack-tags">
+            <span class="tag">typescript</span>
+            <span class="tag">react 19</span>
+            <span class="tag">next.js</span>
+            <span class="tag">tailwind css</span>
+            <span class="tag">shadcn/ui</span>
+            <span class="tag">astro</span>
+          </div>
+        </div>
+        <div class="card reveal">
           <h3>infrastructure</h3>
           <div class="stack-tags">
             <span class="tag">docker</span>
@@ -118,6 +129,7 @@ const projects = (await getCollection('projects'))
             <span class="tag">git</span>
             <span class="tag">render</span>
             <span class="tag">netlify</span>
+            <span class="tag">vercel</span>
           </div>
         </div>
         <div class="card reveal">
@@ -126,7 +138,9 @@ const projects = (await getCollection('projects'))
             <span class="tag">pytest</span>
             <span class="tag">ruff</span>
             <span class="tag">basedpyright</span>
+            <span class="tag">playwright</span>
             <span class="tag">uv</span>
+            <span class="tag">bun</span>
           </div>
         </div>
         <div class="card reveal">
@@ -159,6 +173,12 @@ const projects = (await getCollection('projects'))
           hotel booking API that models real operational problems: temporary room
           holds, double-booking prevention, role-based staff workflows, and a
           booking lifecycle that doesn't fall apart at the edges.
+        </p>
+        <p>
+          Most recently I built <a href="/projects/voicedesk">VoiceDesk</a> end to end:
+          a FastAPI pipeline that transcribes, translates and drafts replies to
+          customer voice notes in Nigerian languages, and a Next.js + TypeScript
+          inbox where a human approves every reply before it goes out.
         </p>
         <p>
           When I'm not writing APIs, I'm breaking and fixing things, debugging
