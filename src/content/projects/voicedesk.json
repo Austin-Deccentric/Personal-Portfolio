@@ -67,31 +67,31 @@
   ],
   "pipeline": [
     {
-      "label": "upload",
+      "label": "Upload",
       "kind": "io"
     },
     {
-      "label": "1 transcribe",
+      "label": "1 Transcribe",
       "kind": "step"
     },
     {
-      "label": "2 translate",
+      "label": "2 Translate",
       "kind": "step"
     },
     {
-      "label": "3 tag intent",
+      "label": "3 Tag intent",
       "kind": "step"
     },
     {
-      "label": "4 draft reply",
+      "label": "4 Draft reply",
       "kind": "step"
     },
     {
-      "label": "human approves",
+      "label": "Human approves",
       "kind": "gate"
     },
     {
-      "label": "send",
+      "label": "Send",
       "kind": "io"
     }
   ],

@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Pane from '../components/Pane.astro';
-import ProjectTable from '../components/ProjectTable.astro';
+import ProjectCard from '../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 import { stackGroups } from '../data/stack';
 
@@ -9,7 +9,7 @@ const featured = (await getCollection('projects'))
   .filter((p) => p.data.featured)
   .sort((a, b) => a.data.order - b.data.order);
 
-const homeStack = stackGroups.filter((g) => g.name !== 'learning');
+const homeStack = stackGroups.filter((g) => g.name !== 'Learning');
 ---
 
 <Base title="Chukwu Austin — Full-Stack Engineer">
@@ -21,33 +21,33 @@ const homeStack = stackGroups.filter((g) => g.name !== 'learning');
       <p>
         <span class="prompt-user">austin@deccentric</span><span class="prompt-path">:~/portfolio$</span> whoami
       </p>
-      <h1 class="hero-title">full-stack engineer<span class="caret" aria-hidden="true">_</span></h1>
+      <h1 class="hero-title">Full-stack engineer<span class="caret" aria-hidden="true">_</span></h1>
       <p class="hero-lede">
         I build APIs that don't break at 3AM — and the interfaces that sit on top of them.
       </p>
       <p class="muted">FastAPI · PostgreSQL · Next.js · TypeScript</p>
       <div class="actions">
-        <a href="#work" class="btn btn-primary">↵ view projects</a>
-        <a href="/contact" class="btn">contact me</a>
+        <a href="#work" class="btn btn-primary">↵ View projects</a>
+        <a href="/contact" class="btn">Contact me</a>
       </div>
     </div>
 
     <div class="hero-status">
-      <p class="pane-title">─ status</p>
+      <p class="pane-title">─ Status</p>
       <dl class="kv">
-        <dt>role</dt><dd>full-stack</dd>
-        <dt>building</dt><dd class="status--in-progress">kekeown</dd>
-        <dt>shipped</dt><dd class="status--shipped">voicedesk</dd>
-        <dt>open to</dt><dd>full-stack, backend</dd>
+        <dt>Role</dt><dd>Full-stack engineer</dd>
+        <dt>Building</dt><dd class="status--in-progress">KekeOwn</dd>
+        <dt>Shipped</dt><dd class="status--shipped">VoiceDesk</dd>
+        <dt>Open to</dt><dd>Full-stack and backend roles</dd>
       </dl>
     </div>
   </Pane>
 
-  <Pane id="now" variant="now" title="CURRENTLY WORKING ON ── cat ./now.txt">
+  <Pane id="now" variant="now" title="Currently working on ── cat ./now.txt">
     <div class="now-head">
       <h2 class="now-title">KekeOwn</h2>
-      <span class="muted small">codename kekevest · team project</span>
-      <span class="status status--in-progress small">◐ in-progress</span>
+      <span class="muted small">Codename kekevest · team project</span>
+      <span class="status status--in-progress small">◐ In progress</span>
     </div>
     <p>
       A managed keke (tricycle) fleet and rider-ownership platform. Riders lease a keke and pay
@@ -59,39 +59,24 @@ const homeStack = stackGroups.filter((g) => g.name !== 'learning');
       repayment schedules, the double-entry ledger, and the rider portal.
     </p>
     <ul class="tags" aria-label="KekeOwn stack">
-      <li class="tag">fastapi</li>
-      <li class="tag">sqlmodel</li>
-      <li class="tag">postgres + postgis</li>
-      <li class="tag">next.js</li>
-      <li class="tag">typescript</li>
-      <li class="tag">paystack</li>
+      <li class="tag">FastAPI</li>
+      <li class="tag">SQLModel</li>
+      <li class="tag">PostgreSQL + PostGIS</li>
+      <li class="tag">Next.js</li>
+      <li class="tag">TypeScript</li>
+      <li class="tag">Paystack</li>
     </ul>
   </Pane>
 
-  <div class="row">
-    <Pane id="work" title={`FEATURED WORK ── ls -la ./projects ── ${featured.length}`} class="grow">
-      <ProjectTable projects={featured} caption="Featured projects" />
-      <p class="small"><a href="/projects" class="hit">view all projects</a></p>
-    </Pane>
-
-    <Pane as="aside" id="stack" title="STACK ── cat ./stack.txt" class="side">
-      {
-        homeStack.map((group) => (
-          <div class="stack-group">
-            <p class="muted small">{group.name}</p>
-            <ul class="tags" aria-label={`${group.name} stack`}>
-              {group.items.map((item) => (
-                <li class="tag">{item}</li>
-              ))}
-            </ul>
-          </div>
-        ))
-      }
-    </Pane>
-  </div>
+  <Pane id="work" title={`Featured work ── ls -la ./projects ── ${featured.length}`}>
+    <div class="cards">
+      {featured.map((project, i) => <ProjectCard project={project} index={i + 1} detailed />)}
+    </div>
+    <p class="small"><a href="/projects" class="hit">View all projects</a></p>
+  </Pane>
 
   <div class="row">
-    <Pane id="about" title="ABOUT ── cat ./about.txt" class="grow">
+    <Pane id="about" title="About ── cat ./about.txt" class="grow">
       <p>
         I like building things end to end — the API, the database behind it, and the screen
         someone actually taps. Most of what I know came from breaking something and refusing to
@@ -105,14 +90,32 @@ const homeStack = stackGroups.filter((g) => g.name !== 'learning');
       <p>When I'm not at the keyboard, I'm usually at the gym.</p>
     </Pane>
 
-    <Pane as="aside" id="contact" title="CONTACT" class="side">
+    <Pane as="aside" id="contact" title="Contact" class="side">
       <ul class="contact-list small">
-        <li><span class="muted">mail </span><a class="hit" href="mailto:chukwuaugust0@gmail.com">chukwuaugust0@gmail.com</a></li>
-        <li><span class="muted">gh   </span><a class="hit" href="https://github.com/Austin-Deccentric" rel="noopener noreferrer">Austin-Deccentric</a></li>
-        <li><span class="muted">in   </span><a class="hit" href="https://www.linkedin.com/in/augustine-chukwu" rel="noopener noreferrer">augustine-chukwu</a></li>
+        <li><span class="muted">Email    </span><a class="hit" href="mailto:chukwuaugust0@gmail.com">chukwuaugust0@gmail.com</a></li>
+        <li><span class="muted">GitHub   </span><a class="hit" href="https://github.com/Austin-Deccentric" rel="noopener noreferrer">Austin-Deccentric</a></li>
+        <li><span class="muted">LinkedIn </span><a class="hit" href="https://www.linkedin.com/in/augustine-chukwu" rel="noopener noreferrer">augustine-chukwu</a></li>
       </ul>
+      <a href="/contact" class="btn btn-primary contact-cta">Contact me</a>
     </Pane>
   </div>
+
+  <Pane id="stack" title="Stack ── cat ./stack.txt">
+    <div class="stack-cols">
+      {
+        homeStack.map((group) => (
+          <div class="stack-group">
+            <h3 class="muted small">{group.name}</h3>
+            <ul class="tags" aria-label={`${group.name} stack`}>
+              {group.items.map((item) => (
+                <li class="tag">{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </Pane>
 </Base>
 
 <style>
@@ -164,21 +167,35 @@ const homeStack = stackGroups.filter((g) => g.name !== 'learning');
     font-size: 28px;
   }
 
+  .stack-cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+    gap: var(--gap);
+  }
+
   .stack-group {
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
 
+  .stack-group h3 {
+    font-weight: 400;
+  }
+
   .contact-list {
     display: flex;
     flex-direction: column;
-    gap: 0;
     white-space: pre;
   }
 
   .contact-list a {
     white-space: normal;
     overflow-wrap: anywhere;
+  }
+
+  .contact-cta {
+    align-self: flex-start;
+    margin-top: 8px;
   }
 </style>

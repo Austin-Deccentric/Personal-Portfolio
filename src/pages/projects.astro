@@ -1,13 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
 import Pane from '../components/Pane.astro';
-import ProjectTable from '../components/ProjectTable.astro';
+import ProjectCard from '../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
+import { statusInfo } from '../data/status';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 
-const featured = projects.filter((p) => p.data.featured);
-const other = projects.filter((p) => !p.data.featured);
+// One filter per status that has projects, in the order statusInfo lists them.
+const filters = (Object.keys(statusInfo) as (keyof typeof statusInfo)[])
+  .map((key) => ({ key, label: statusInfo[key].label, count: projects.filter((p) => p.data.status === key).length }))
+  .filter((f) => f.count > 0);
 ---
 
 <Base title="Projects — Chukwu Austin">
@@ -22,17 +25,73 @@ const other = projects.filter((p) => !p.data.featured);
     </p>
   </Pane>
 
-  <Pane title={`FEATURED ── ${featured.length}`}>
-    <ProjectTable projects={featured} caption="Featured projects" />
-  </Pane>
-
-  <Pane title={`ALSO BUILT ── ${other.length}`}>
-    <ProjectTable projects={other} caption="Other projects" />
+  <Pane title={`Projects ── ${projects.length}`}>
+    <div class="filters" role="group" aria-label="Filter projects by status" data-filters hidden>
+      <button type="button" class="btn filter" aria-pressed="true" data-filter="all">
+        All <span class="muted">{projects.length}</span>
+      </button>
+      {
+        filters.map((f) => (
+          <button type="button" class="btn filter" aria-pressed="false" data-filter={f.key}>
+            {f.label} <span class="muted">{f.count}</span>
+          </button>
+        ))
+      }
+    </div>
+    <p class="sr-only" aria-live="polite" data-filter-status></p>
+    <div class="cards">
+      {projects.map((project, i) => <ProjectCard project={project} index={i + 1} />)}
+    </div>
   </Pane>
 </Base>
+
+<script is:inline>
+  (function () {
+    var group = document.querySelector('[data-filters]');
+    var status = document.querySelector('[data-filter-status]');
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.pcard'));
+    var buttons = Array.prototype.slice.call(group.querySelectorAll('[data-filter]'));
+    group.hidden = false;
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-filter');
+        var shown = 0;
+        cards.forEach(function (card) {
+          var match = key === 'all' || card.getAttribute('data-status') === key;
+          card.hidden = !match;
+          if (match) shown++;
+        });
+        buttons.forEach(function (b) {
+          b.setAttribute('aria-pressed', String(b === btn));
+        });
+        status.textContent = 'Showing ' + shown + ' project' + (shown === 1 ? '' : 's');
+      });
+    });
+  })();
+</script>
 
 <style>
   .page-title {
     font-size: clamp(28px, 5vw, 40px);
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .filters[hidden] {
+    display: none;
+  }
+
+  .filter {
+    gap: 8px;
+  }
+
+  .filter[aria-pressed='true'] {
+    border-color: var(--green);
+    color: var(--green);
   }
 </style>

@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import Pane from '../../components/Pane.astro';
 import { getCollection } from 'astro:content';
+import { statusInfo } from '../../data/status';
 
 export async function getStaticPaths() {
   const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
@@ -33,7 +34,7 @@ const {
   pipelineNote,
 } = project.data;
 
-const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } as const;
+const status_ = statusInfo[status];
 ---
 
 <Base title={`${title} — Chukwu Austin`} description={description}>
@@ -45,22 +46,22 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
 
   <Pane as="header" variant="active" loose>
     <p class="small prompt-user">
-      ┌─ case study ── {year} ── <span class={`status status--${status}`}>{statusGlyph[status]} {status}</span>
+      ┌─ Case study ── {year} ── <span class={`status status--${status}`}>{status_.glyph} {status_.label}</span>
     </p>
     <h1 class="case-title">{title}</h1>
     <p class="case-tagline">{tagline}</p>
     <p class="secondary">{description}</p>
     <div class="actions">
-      {live && <a href={live} class="btn btn-primary" rel="noopener noreferrer">↗ open live site</a>}
-      {docs && <a href={docs} class="btn" rel="noopener noreferrer">read api docs</a>}
-      {repo && <a href={repo} class="btn" rel="noopener noreferrer">view source</a>}
-      <span class="btn role" aria-label={`Role: ${role}`}>role: {role.toLowerCase()}</span>
+      {live && <a href={live} class="btn btn-primary" rel="noopener noreferrer">↗ Open live site</a>}
+      {docs && <a href={docs} class="btn" rel="noopener noreferrer">Read API docs</a>}
+      {repo && <a href={repo} class="btn" rel="noopener noreferrer">View source</a>}
+      <span class="btn role" aria-label={`Role: ${role}`}>Role: {role}</span>
     </div>
   </Pane>
 
   {
     pipeline.length > 0 && (
-      <Pane title="PIPELINE">
+      <Pane title="Pipeline">
         <ol class="pipeline">
           {pipeline.map((stage, i) => (
             <li class={`stage stage--${stage.kind}`}>
@@ -76,7 +77,7 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
 
   {
     problem && (
-      <Pane title="PROBLEM">
+      <Pane title="Problem">
         <p>{problem}</p>
       </Pane>
     )
@@ -86,7 +87,7 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
     (highlights.length > 0 || decisions.length > 0) && (
       <div class="row">
         {highlights.length > 0 && (
-          <Pane title="HIGHLIGHTS" class="half">
+          <Pane title="Highlights" class="half">
             <ul class="bullets">
               {highlights.map((h) => (
                 <li>{h}</li>
@@ -95,7 +96,7 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
           </Pane>
         )}
         {decisions.length > 0 && (
-          <Pane title="DECISIONS" class="half">
+          <Pane title="Decisions" class="half">
             <ul class="bullets bullets--decisions">
               {decisions.map((d) => (
                 <li>{d}</li>
@@ -111,7 +112,7 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
     (constraints.length > 0 || architecture.length > 0) && (
       <div class="row">
         {constraints.length > 0 && (
-          <Pane title="CONSTRAINTS" class="half">
+          <Pane title="Constraints" class="half">
             <ul class="bullets">
               {constraints.map((c) => (
                 <li>{c}</li>
@@ -120,7 +121,7 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
           </Pane>
         )}
         {architecture.length > 0 && (
-          <Pane title="ARCHITECTURE" class="half">
+          <Pane title="Architecture" class="half">
             <ul class="bullets">
               {architecture.map((a) => (
                 <li>{a}</li>
@@ -134,7 +135,7 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
 
   {
     next.length > 0 && (
-      <Pane title="TODO">
+      <Pane title="Next steps">
         <ul class="bullets bullets--todo">
           {next.map((n) => (
             <li>{n}</li>
@@ -144,16 +145,16 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
     )
   }
 
-  <Pane title="STACK">
+  <Pane title="Stack">
     <ul class="tags" aria-label={`${title} stack`}>
-      {stack.map((tech) => <li class="tag">{tech.toLowerCase()}</li>)}
+      {stack.map((tech) => <li class="tag">{tech}</li>)}
     </ul>
   </Pane>
 
   {
     nextProject.id !== project.id && (
       <p class="small">
-        <span class="muted">next:</span>
+        <span class="muted">Next project:</span>
         <a class="hit" href={`/projects/${nextProject.id}`}>{nextProject.data.title} →</a>
       </p>
     )

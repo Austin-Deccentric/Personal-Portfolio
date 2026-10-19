@@ -5,24 +5,24 @@ import Pane from '../components/Pane.astro';
 const channels = [
   {
     cmd: '$ mail',
-    name: 'email',
+    name: 'Email',
     value: 'chukwuaugust0@gmail.com',
     href: 'mailto:chukwuaugust0@gmail.com',
-    note: 'best for detailed messages and job opportunities',
+    note: 'Best for detailed messages and job opportunities',
   },
   {
     cmd: '$ git remote -v',
-    name: 'github',
+    name: 'GitHub',
     value: 'github.com/Austin-Deccentric',
     href: 'https://github.com/Austin-Deccentric',
-    note: 'code, contributions and open source work',
+    note: 'Code, contributions and open source work',
   },
   {
     cmd: '$ cat ./resume',
-    name: 'linkedin',
+    name: 'LinkedIn',
     value: 'linkedin.com/in/augustine-chukwu',
     href: 'https://www.linkedin.com/in/augustine-chukwu',
-    note: 'professional profile and resume',
+    note: 'Professional profile and resume',
   },
 ];
 ---
@@ -42,7 +42,7 @@ const channels = [
   <div class="contact-grid">
     {
       channels.map((c) => (
-        <Pane title={c.name.toUpperCase()}>
+        <Pane title={c.name}>
           <p class="prompt-user small">{c.cmd}</p>
           <a
             href={c.href}

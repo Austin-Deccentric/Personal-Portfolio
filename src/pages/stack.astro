@@ -18,7 +18,7 @@ import { stackGroups } from '../data/stack';
   <div class="stack-grid">
     {
       stackGroups.map((group) => (
-        <Pane title={group.name.toUpperCase()}>
+        <Pane title={group.name}>
           <p class="muted small">{group.desc}</p>
           <ul class="tags" aria-label={`${group.name} stack`}>
             {group.items.map((item) => (

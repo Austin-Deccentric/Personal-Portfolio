@@ -20,10 +20,10 @@ const ogImageUrl = ogImage ?? (Astro.site ? new URL('og-image.png', Astro.site).
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const tabs = [
-  { key: '1', label: 'home', short: 'home', href: '/', active: path === '/' },
-  { key: '2', label: 'projects', short: 'work', href: '/projects', active: path.startsWith('/projects') },
-  { key: '3', label: 'stack', short: 'stack', href: '/stack', active: path === '/stack' },
-  { key: '4', label: 'contact', short: 'mail', href: '/contact', active: path === '/contact' },
+  { key: '1', label: 'Home', short: 'Home', href: '/', active: path === '/' },
+  { key: '2', label: 'Projects', short: 'Work', href: '/projects', active: path.startsWith('/projects') },
+  { key: '3', label: 'Stack', short: 'Stack', href: '/stack', active: path === '/stack' },
+  { key: '4', label: 'Contact', short: 'Contact', href: '/contact', active: path === '/contact' },
 ];
 
 const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
@@ -72,7 +72,7 @@ const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
     </script>
   </head>
   <body>
-    <a class="skip-link" href="#main">skip to content</a>
+    <a class="skip-link" href="#main">Skip to content</a>
 
     <div class="shell">
       <nav class="tabs" aria-label="Primary">
@@ -84,16 +84,17 @@ const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
               aria-current={tab.active ? 'page' : undefined}
               aria-keyshortcuts={tab.key}
             >
-              {tab.key}:{tab.label}
+              <span class="key" aria-hidden="true">{tab.key}</span>
+              {tab.label}
             </a>
           ))
         }
         <span class="tabs-end-group">
           <button id="keys-toggle" type="button" aria-pressed="true">
-            <span id="keys-label">turn off</span> shortcuts
+            <span id="keys-label">Turn off</span> shortcuts
           </button>
           <button id="theme-toggle" type="button" aria-keyshortcuts="t">
-            [t] switch to <span id="theme-label">light</span>
+            <span class="key" aria-hidden="true">t</span> Switch to <span id="theme-label">light</span>
           </button>
         </span>
       </nav>
@@ -108,11 +109,11 @@ const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
           <span class="cell">{displayPath}</span>
         </span>
         <span>
-          <span class="cell hide-sm muted">open to full-stack &amp; backend roles</span>
+          <span class="cell hide-sm muted">Open to full-stack and backend roles</span>
           <span class="cell">
-            <a href="https://github.com/Austin-Deccentric" rel="noopener noreferrer" aria-label="GitHub">gh</a>
-            · <a href="https://www.linkedin.com/in/augustine-chukwu" rel="noopener noreferrer" aria-label="LinkedIn">in</a>
-            · <a href="mailto:chukwuaugust0@gmail.com" aria-label="Email">mail</a>
+            <a href="https://github.com/Austin-Deccentric" rel="noopener noreferrer">GitHub</a>
+            · <a href="https://www.linkedin.com/in/augustine-chukwu" rel="noopener noreferrer">LinkedIn</a>
+            · <a href="mailto:chukwuaugust0@gmail.com">Email</a>
           </span>
         </span>
       </footer>
@@ -122,7 +123,7 @@ const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
       {
         tabs.map((tab) => (
           <a href={tab.href} aria-current={tab.active ? 'page' : undefined}>
-            {tab.key}:{tab.short}
+            {tab.short}
           </a>
         ))
       }
@@ -165,7 +166,7 @@ const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
 
         function renderKeys() {
           keysToggle.setAttribute('aria-pressed', String(keysOn));
-          keysLabel.textContent = keysOn ? 'turn off' : 'turn on';
+          keysLabel.textContent = keysOn ? 'Turn off' : 'Turn on';
           toggle.setAttribute('aria-keyshortcuts', keysOn ? 't' : '');
         }
 

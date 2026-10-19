@@ -7,28 +7,28 @@ export interface StackGroup {
 
 export const stackGroups: StackGroup[] = [
   {
-    name: 'backend',
+    name: 'Backend',
     desc: 'APIs, data modelling and business logic',
-    items: ['python', 'fastapi', 'sqlmodel', 'sqlalchemy 2', 'pydantic', 'postgresql', 'redis', 'alembic', 'slowapi', 'apscheduler'],
+    items: ['Python', 'FastAPI', 'SQLModel', 'SQLAlchemy 2', 'Pydantic', 'PostgreSQL', 'Redis', 'Alembic', 'SlowAPI', 'APScheduler'],
   },
   {
-    name: 'frontend',
+    name: 'Frontend',
     desc: 'Interfaces, client state and the browser',
-    items: ['typescript', 'react 19', 'next.js', 'tailwind css', 'shadcn/ui', 'astro'],
+    items: ['TypeScript', 'React 19', 'Next.js', 'Tailwind CSS', 'shadcn/ui', 'Astro'],
   },
   {
-    name: 'infra',
+    name: 'Infra',
     desc: 'Deployment, containers and tooling',
-    items: ['docker', 'docker compose', 'linux', 'bash', 'git', 'render', 'vercel', 'netlify', 'neon', 'uv', 'bun'],
+    items: ['Docker', 'Docker Compose', 'Linux', 'Bash', 'Git', 'Render', 'Vercel', 'Netlify', 'Neon', 'uv', 'Bun'],
   },
   {
-    name: 'testing',
+    name: 'Testing',
     desc: 'Catching bugs before users do',
-    items: ['pytest', 'playwright', 'axe-core', 'ruff', 'basedpyright', 'eslint'],
+    items: ['pytest', 'Playwright', 'axe-core', 'Ruff', 'basedpyright', 'ESLint'],
   },
   {
-    name: 'learning',
+    name: 'Learning',
     desc: "Where I'm growing next",
-    items: ['data pipelines', 'cloud infra', 'agentic ai', 'llms'],
+    items: ['Data pipelines', 'Cloud infra', 'Agentic AI', 'LLMs'],
   },
 ];
