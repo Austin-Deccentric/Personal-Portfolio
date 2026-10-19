@@ -77,8 +77,8 @@ const status_ = statusInfo[status];
 
   {
     problem && (
-      <Pane title="Problem">
-        <p>{problem}</p>
+      <Pane title="Problem" class="problem">
+        <p class="problem-text">{problem}</p>
       </Pane>
     )
   }
@@ -193,6 +193,30 @@ const status_ = statusInfo[status];
   .role:hover {
     color: var(--muted);
     border-color: var(--border);
+  }
+
+  /* .problem sits on the Pane root, outside this page's scope. */
+  :global(.pane.problem) {
+    align-items: center;
+    padding: 48px 64px;
+    gap: 16px;
+  }
+
+  /* Title and paragraph share one centred reading column. */
+  :global(.pane.problem > *) {
+    width: 100%;
+    max-width: 704px;
+  }
+
+  .problem-text {
+    font-size: 18px;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 767.98px) {
+    :global(.pane.problem) {
+      padding: 32px 16px;
+    }
   }
 
   .pipeline {
