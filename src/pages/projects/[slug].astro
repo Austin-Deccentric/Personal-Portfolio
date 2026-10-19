@@ -38,7 +38,7 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
 
 <Base title={`${title} — Chukwu Austin`} description={description}>
   <nav aria-label="Breadcrumb" class="crumbs small muted">
-    <a href="/">~/portfolio</a><span aria-hidden="true">/</span><a href="/projects">projects</a><span
+    <a class="hit" href="/">~/portfolio</a><span aria-hidden="true">/</span><a class="hit" href="/projects">projects</a><span
       aria-hidden="true">/</span
     ><span aria-current="page">{project.id}</span>
   </nav>
@@ -51,8 +51,8 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
     <p class="case-tagline">{tagline}</p>
     <p class="secondary">{description}</p>
     <div class="actions">
-      {live && <a href={live} class="btn btn-primary" rel="noopener noreferrer">↗ open live</a>}
-      {docs && <a href={docs} class="btn" rel="noopener noreferrer">api docs</a>}
+      {live && <a href={live} class="btn btn-primary" rel="noopener noreferrer">↗ open live site</a>}
+      {docs && <a href={docs} class="btn" rel="noopener noreferrer">read api docs</a>}
       {repo && <a href={repo} class="btn" rel="noopener noreferrer">view source</a>}
       <span class="btn role" aria-label={`Role: ${role}`}>role: {role.toLowerCase()}</span>
     </div>
@@ -154,7 +154,7 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
     nextProject.id !== project.id && (
       <p class="small">
         <span class="muted">next:</span>
-        <a href={`/projects/${nextProject.id}`}>{nextProject.data.title} →</a>
+        <a class="hit" href={`/projects/${nextProject.id}`}>{nextProject.data.title} →</a>
       </p>
     )
   }
@@ -164,6 +164,7 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
   .crumbs {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
   }
 
@@ -172,8 +173,7 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
   }
 
   .case-title {
-    font-size: clamp(36px, 7vw, 56px);
-    font-weight: 700;
+    font-size: clamp(32px, 7vw, 48px);
   }
 
   .case-tagline {
@@ -181,7 +181,7 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
   }
 
   .actions {
-    margin-top: 6px;
+    margin-top: 8px;
   }
 
   .role {
@@ -199,19 +199,19 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     font-size: 14px;
   }
 
   .stage {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
 
   .stage-box {
     border: 1px solid var(--border);
-    padding: 10px 14px;
+    padding: 12px 16px;
   }
 
   .stage--step .stage-box {
@@ -223,6 +223,6 @@ const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } 
     background: var(--yellow);
     border-color: var(--yellow);
     color: var(--on-accent);
-    font-weight: 700;
+    font-weight: 600;
   }
 </style>

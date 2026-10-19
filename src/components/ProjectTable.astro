@@ -70,20 +70,24 @@ const slugify = (s: string) =>
   }
 
   .ptable-name a {
-    font-weight: 700;
-    color: var(--text-strong);
+    font-weight: 600;
+    color: var(--green);
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin: -12px 0;
   }
 
   .ptable-name a:hover {
-    color: var(--green);
+    color: var(--green-hover);
   }
 
   .ptable-stack {
-    color: var(--cyan);
+    color: var(--text-secondary);
   }
 
   /* Phones: each row becomes a stacked card. */
-  @media (max-width: 640px) {
+  @media (max-width: 767.98px) {
     thead {
       display: none;
     }
@@ -106,6 +110,10 @@ const slugify = (s: string) =>
       display: block;
       padding: 0;
       border: 0;
+    }
+
+    .ptable-name a {
+      margin: 0;
     }
 
     td:nth-child(5) {

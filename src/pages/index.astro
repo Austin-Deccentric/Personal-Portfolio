@@ -28,7 +28,7 @@ const homeStack = stackGroups.filter((g) => g.name !== 'learning');
       <p class="muted">FastAPI · PostgreSQL · Next.js · TypeScript</p>
       <div class="actions">
         <a href="#work" class="btn btn-primary">↵ view projects</a>
-        <a href="/contact" class="btn">contact.sh</a>
+        <a href="/contact" class="btn">contact me</a>
       </div>
     </div>
 
@@ -71,7 +71,7 @@ const homeStack = stackGroups.filter((g) => g.name !== 'learning');
   <div class="row">
     <Pane id="work" title={`FEATURED WORK ── ls -la ./projects ── ${featured.length}`} class="grow">
       <ProjectTable projects={featured} caption="Featured projects" />
-      <p class="muted small"><a href="/projects">ls ./projects/all</a></p>
+      <p class="small"><a href="/projects" class="hit">view all projects</a></p>
     </Pane>
 
     <Pane as="aside" id="stack" title="STACK ── cat ./stack.txt" class="side">
@@ -107,9 +107,9 @@ const homeStack = stackGroups.filter((g) => g.name !== 'learning');
 
     <Pane as="aside" id="contact" title="CONTACT" class="side">
       <ul class="contact-list small">
-        <li><span class="muted">mail </span><a href="mailto:chukwuaugust0@gmail.com">chukwuaugust0@gmail.com</a></li>
-        <li><span class="muted">gh   </span><a href="https://github.com/Austin-Deccentric" rel="noopener noreferrer">Austin-Deccentric</a></li>
-        <li><span class="muted">in   </span><a href="https://www.linkedin.com/in/augustine-chukwu" rel="noopener noreferrer">augustine-chukwu</a></li>
+        <li><span class="muted">mail </span><a class="hit" href="mailto:chukwuaugust0@gmail.com">chukwuaugust0@gmail.com</a></li>
+        <li><span class="muted">gh   </span><a class="hit" href="https://github.com/Austin-Deccentric" rel="noopener noreferrer">Austin-Deccentric</a></li>
+        <li><span class="muted">in   </span><a class="hit" href="https://www.linkedin.com/in/augustine-chukwu" rel="noopener noreferrer">augustine-chukwu</a></li>
       </ul>
     </Pane>
   </div>
@@ -132,12 +132,11 @@ const homeStack = stackGroups.filter((g) => g.name !== 'learning');
   }
 
   .hero-title {
-    font-size: clamp(34px, 6vw, 52px);
-    font-weight: 700;
+    font-size: clamp(32px, 6vw, 48px);
   }
 
   .hero-lede {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .hero-status {
@@ -168,13 +167,13 @@ const homeStack = stackGroups.filter((g) => g.name !== 'learning');
   .stack-group {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
   }
 
   .contact-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0;
     white-space: pre;
   }
 

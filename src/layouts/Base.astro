@@ -55,7 +55,7 @@ const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
 
@@ -88,9 +88,14 @@ const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
             </a>
           ))
         }
-        <button class="tabs-end" id="theme-toggle" type="button" aria-keyshortcuts="t">
-          [t] theme: <span id="theme-label">dark</span>
-        </button>
+        <span class="tabs-end-group">
+          <button id="keys-toggle" type="button" aria-pressed="true">
+            <span id="keys-label">turn off</span> shortcuts
+          </button>
+          <button id="theme-toggle" type="button" aria-keyshortcuts="t">
+            [t] switch to <span id="theme-label">light</span>
+          </button>
+        </span>
       </nav>
 
       <main id="main" class="stack-v" style="gap: var(--gap)">
@@ -105,9 +110,9 @@ const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
         <span>
           <span class="cell hide-sm muted">open to full-stack &amp; backend roles</span>
           <span class="cell">
-            <a href="https://github.com/Austin-Deccentric" rel="noopener noreferrer">gh</a>
-            · <a href="https://www.linkedin.com/in/augustine-chukwu" rel="noopener noreferrer">in</a>
-            · <a href="mailto:chukwuaugust0@gmail.com">mail</a>
+            <a href="https://github.com/Austin-Deccentric" rel="noopener noreferrer" aria-label="GitHub">gh</a>
+            · <a href="https://www.linkedin.com/in/augustine-chukwu" rel="noopener noreferrer" aria-label="LinkedIn">in</a>
+            · <a href="mailto:chukwuaugust0@gmail.com" aria-label="Email">mail</a>
           </span>
         </span>
       </footer>
@@ -132,29 +137,56 @@ const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
           return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
         }
 
+        function other(theme) {
+          return theme === 'dark' ? 'light' : 'dark';
+        }
+
         function setTheme(next) {
           document.documentElement.setAttribute('data-theme', next);
           try {
             localStorage.setItem('theme', next);
           } catch (e) {}
-          label.textContent = next;
+          label.textContent = other(next);
         }
 
-        label.textContent = current();
+        label.textContent = other(current());
         toggle.addEventListener('click', function () {
-          setTheme(current() === 'dark' ? 'light' : 'dark');
+          setTheme(other(current()));
         });
 
-        // Single-key shortcuts, matching the hints in the tab line.
+        // Single-key shortcuts, matching the hints in the tab line. They can be
+        // turned off (WCAG 2.1.4), and the choice is remembered.
+        var keysToggle = document.getElementById('keys-toggle');
+        var keysLabel = document.getElementById('keys-label');
+        var keysOn = true;
+        try {
+          keysOn = localStorage.getItem('shortcuts') !== 'off';
+        } catch (e) {}
+
+        function renderKeys() {
+          keysToggle.setAttribute('aria-pressed', String(keysOn));
+          keysLabel.textContent = keysOn ? 'turn off' : 'turn on';
+          toggle.setAttribute('aria-keyshortcuts', keysOn ? 't' : '');
+        }
+
+        renderKeys();
+        keysToggle.addEventListener('click', function () {
+          keysOn = !keysOn;
+          try {
+            localStorage.setItem('shortcuts', keysOn ? 'on' : 'off');
+          } catch (e) {}
+          renderKeys();
+        });
+
         var routes = { '1': '/', '2': '/projects', '3': '/stack', '4': '/contact' };
         document.addEventListener('keydown', function (e) {
-          if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
+          if (!keysOn || e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
           var t = e.target;
           if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
           if (routes[e.key]) {
             window.location.href = routes[e.key];
           } else if (e.key === 't') {
-            setTheme(current() === 'dark' ? 'light' : 'dark');
+            setTheme(other(current()));
           }
         });
       })();
