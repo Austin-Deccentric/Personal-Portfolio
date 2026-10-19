@@ -1,97 +1,97 @@
 ---
 import Base from '../layouts/Base.astro';
-import Panel from '../components/Panel.astro';
+import Pane from '../components/Pane.astro';
+import ProjectCard from '../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
+import { statusInfo } from '../data/status';
 
-const projects = (await getCollection('projects')).sort(
-  (a, b) => a.data.order - b.data.order
-);
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 
-const featured = projects.filter((p) => p.data.featured);
-const other = projects.filter((p) => !p.data.featured);
+// One filter per status that has projects, in the order statusInfo lists them.
+const filters = (Object.keys(statusInfo) as (keyof typeof statusInfo)[])
+  .map((key) => ({ key, label: statusInfo[key].label, count: projects.filter((p) => p.data.status === key).length }))
+  .filter((f) => f.count > 0);
 ---
 
 <Base title="Projects — Chukwu Austin">
-  <section class="section">
-    <div class="container">
-      <p class="section-label">ls -la ./projects</p>
-      <h1 class="section-title">All projects</h1>
-      <p class="section-intro">
-        Full-stack apps, APIs and tools I've built — from a voice-note inbox and a
-        production-shaped hotel booking system to smaller coursework projects.
-      </p>
+  <Pane as="header" variant="active">
+    <p class="muted small">
+      <span class="prompt-user">austin@deccentric</span><span class="prompt-path">:~/portfolio$</span> ls -la ./projects
+    </p>
+    <h1 class="page-title">All projects</h1>
+    <p class="secondary">
+      Full-stack apps, APIs and tools I've built — from a voice-note inbox and a hotel booking
+      system to smaller coursework projects.
+    </p>
+  </Pane>
 
-      <h2 class="group-title reveal">./featured</h2>
-      <div>
-        {
-          featured.map((project, i) => (
-            <Panel
-              title={project.data.title}
-              status={project.data.status}
-              meta={project.data.year}
-              index={String(i + 1).padStart(2, '0')}
-              href={`/projects/${project.id}`}
-              reveal
-              scramble
-            >
-              <p class="panel-tagline">{project.data.tagline}</p>
-              <p class="panel-desc">{project.data.description.slice(0, 140)}...</p>
-              <div class="panel-stack">
-                {project.data.stack.slice(0, 5).map((tech) => (
-                  <span class="tag">{tech}</span>
-                ))}
-                {project.data.stack.length > 5 && (
-                  <span class="tag">+{project.data.stack.length - 5}</span>
-                )}
-              </div>
-            </Panel>
-          ))
-        }
-      </div>
-
-      <h2 class="group-title reveal">./also-built</h2>
-      <div>
-        {
-          other.map((project, i) => (
-            <Panel
-              title={project.data.title}
-              status={project.data.status}
-              index={String(i + 1).padStart(2, '0')}
-              href={project.data.repo ?? `/projects/${project.id}`}
-              external={Boolean(project.data.repo)}
-              reveal
-            >
-              <p class="panel-tagline">{project.data.tagline}</p>
-              <div class="panel-stack">
-                {project.data.stack.slice(0, 3).map((tech) => (
-                  <span class="tag">{tech}</span>
-                ))}
-              </div>
-            </Panel>
-          ))
-        }
-      </div>
+  <Pane title={`Projects ── ${projects.length}`}>
+    <div class="filters" role="group" aria-label="Filter projects by status" data-filters hidden>
+      <button type="button" class="btn filter" aria-pressed="true" data-filter="all">
+        All <span class="muted">{projects.length}</span>
+      </button>
+      {
+        filters.map((f) => (
+          <button type="button" class="btn filter" aria-pressed="false" data-filter={f.key}>
+            {f.label} <span class="muted">{f.count}</span>
+          </button>
+        ))
+      }
     </div>
-  </section>
+    <p class="sr-only" aria-live="polite" data-filter-status></p>
+    <div class="cards">
+      {projects.map((project, i) => <ProjectCard project={project} index={i + 1} />)}
+    </div>
+  </Pane>
 </Base>
 
+<script is:inline>
+  (function () {
+    var group = document.querySelector('[data-filters]');
+    var status = document.querySelector('[data-filter-status]');
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.pcard'));
+    var buttons = Array.prototype.slice.call(group.querySelectorAll('[data-filter]'));
+    group.hidden = false;
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var key = btn.getAttribute('data-filter');
+        var shown = 0;
+        cards.forEach(function (card) {
+          var match = key === 'all' || card.getAttribute('data-status') === key;
+          card.hidden = !match;
+          if (match) shown++;
+        });
+        buttons.forEach(function (b) {
+          b.setAttribute('aria-pressed', String(b === btn));
+        });
+        status.textContent = 'Showing ' + shown + ' project' + (shown === 1 ? '' : 's');
+      });
+    });
+  })();
+</script>
+
 <style>
-  .section-intro {
-    max-width: 560px;
-    margin-bottom: 2rem;
-    font-size: 0.9rem;
+  .page-title {
+    font-size: clamp(28px, 5vw, 40px);
   }
 
-  .group-title {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    margin: 2rem 0 0.75rem;
-    font-family: var(--font-mono);
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
-  .group-title::before {
-    content: "$ ";
+  .filters[hidden] {
+    display: none;
+  }
+
+  .filter {
+    gap: 8px;
+  }
+
+  .filter[aria-pressed='true'] {
+    border-color: var(--green);
     color: var(--green);
   }
 </style>

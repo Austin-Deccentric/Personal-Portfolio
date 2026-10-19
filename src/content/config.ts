@@ -20,6 +20,11 @@ const projects = defineCollection({
     architecture: z.array(z.string()).default([]),
     decisions: z.array(z.string()).default([]),
     next: z.array(z.string()).default([]),
+    // Optional flow diagram: io = endpoints, step = automated stage, gate = human checkpoint.
+    pipeline: z
+      .array(z.object({ label: z.string(), kind: z.enum(['io', 'step', 'gate']) }))
+      .default([]),
+    pipelineNote: z.string().optional(),
     order: z.number().default(99),
   }),
 });

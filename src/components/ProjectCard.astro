@@ -1,0 +1,96 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { statusInfo } from '../data/status';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  index: number;
+  detailed?: boolean;
+}
+
+const { project, index, detailed = false } = Astro.props;
+const { title, tagline, description, year, status, stack } = project.data;
+const shownStack = stack.slice(0, 4);
+const status_ = statusInfo[status];
+---
+
+<article class="pcard" data-status={status}>
+  <p class="pcard-meta small">
+    <span class="muted">{String(index).padStart(2, '0')} · {year}</span>
+    <span class={`status status--${status}`}>{status_.glyph} {status_.label}</span>
+  </p>
+  <h3 class="pcard-title">
+    <a href={`/projects/${project.id}`} class="pcard-link">{title}</a>
+  </h3>
+  <p class="secondary">{tagline}</p>
+  {detailed && <p class="pcard-desc">{description}</p>}
+  <ul class="tags" aria-label={`${title} stack`}>
+    {shownStack.map((tech) => <li class="tag">{tech}</li>)}
+    {stack.length > shownStack.length && <li class="muted">+{stack.length - shownStack.length}</li>}
+  </ul>
+  <p class="pcard-cta small" aria-hidden="true">Read case study →</p>
+</article>
+
+<style>
+  .pcard {
+    position: relative;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pcard[hidden] {
+    display: none;
+  }
+
+  .pcard:hover,
+  .pcard:focus-within {
+    border-color: var(--green);
+  }
+
+  .pcard-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .pcard-title {
+    font-size: 24px;
+  }
+
+  .pcard-link {
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  /* The title link covers the whole card, so the card is one tap target. */
+  .pcard-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .pcard-link:focus-visible {
+    outline: none;
+  }
+
+  .pcard:has(.pcard-link:focus-visible) {
+    outline: 2px solid var(--green);
+    outline-offset: 3px;
+  }
+
+  .pcard-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .pcard-cta {
+    margin-top: auto;
+    color: var(--green);
+  }
+</style>

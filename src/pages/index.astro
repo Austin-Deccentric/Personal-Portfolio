@@ -1,299 +1,201 @@
 ---
 import Base from '../layouts/Base.astro';
-import Panel from '../components/Panel.astro';
+import Pane from '../components/Pane.astro';
+import ProjectCard from '../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
+import { stackGroups } from '../data/stack';
 
-const projects = (await getCollection('projects'))
+const featured = (await getCollection('projects'))
   .filter((p) => p.data.featured)
   .sort((a, b) => a.data.order - b.data.order);
+
+const homeStack = stackGroups.filter((g) => g.name !== 'Learning');
 ---
 
 <Base title="Chukwu Austin — Full-Stack Engineer">
-  <section class="hero">
-    <div class="container">
-      <div class="boot" data-boot aria-label="loading log">
-        <div class="boot-line" data-boot-line="0">[+] loading profile …</div>
-        <div class="boot-line" data-boot-line="1">[+] mounting ./projects …</div>
-        <div class="boot-line" data-boot-line="2"><span class="boot-ok">[✓] ready</span></div>
-      </div>
-
-      <div class="terminal-block">
-        <div class="terminal-line">
-          <span class="prompt">augustine@enugu</span><span class="prompt-path">:~/portfolio$</span>
-          <span class="terminal-cmd">whoami</span>
-        </div>
-        <div class="terminal-line terminal-output">
-          full-stack engineer · enugu, ng
-        </div>
-        <div class="terminal-line">
-          <span class="prompt">augustine@enugu</span><span class="prompt-path">:~/portfolio$</span>
-          <span class="terminal-cmd">cat ./intro.txt</span>
-        </div>
-        <div class="terminal-line terminal-output">
-          I build APIs that don't break at 3AM.
-        </div>
-        <div class="terminal-line terminal-output">
-          FastAPI · PostgreSQL · Next.js · TypeScript
-        </div>
-        <div class="terminal-line terminal-output">
-          currently open to full-stack &amp; backend roles
-        </div>
-        <div class="terminal-line">
-          <span class="prompt">augustine@enugu</span><span class="prompt-path">:~/portfolio$</span>
-          <span class="cursor"></span>
-        </div>
-      </div>
-
-      <div class="hero-actions">
-        <a href="/#projects" class="btn btn-primary">./view-projects.sh</a>
-        <a href="/contact" class="btn btn-outline">./contact.sh</a>
+  <Pane as="header" variant="active" loose class="hero">
+    <div class="hero-main">
+      <p class="muted small">
+        [+] loading profile … [+] mounting ./projects … <span class="prompt-user">[✓] ready</span>
+      </p>
+      <p>
+        <span class="prompt-user">austin@deccentric</span><span class="prompt-path">:~/portfolio$</span> whoami
+      </p>
+      <h1 class="hero-title">Full-stack engineer<span class="caret" aria-hidden="true">_</span></h1>
+      <p class="hero-lede">
+        I build APIs that don't break at 3AM — and the interfaces that sit on top of them.
+      </p>
+      <p class="muted">FastAPI · PostgreSQL · Next.js · TypeScript</p>
+      <div class="actions">
+        <a href="#work" class="btn btn-primary">↵ View projects</a>
+        <a href="/contact" class="btn">Contact me</a>
       </div>
     </div>
-  </section>
 
-  <section class="section" id="projects">
-    <div class="container">
-      <p class="section-label reveal">ls -la ./projects</p>
-      <h2 class="section-title reveal">Featured work</h2>
-
-      <div>
-        {
-          projects.map((project, i) => (
-            <Panel
-              title={project.data.title}
-              status={project.data.status}
-              meta={project.data.year}
-              index={String(i + 1).padStart(2, '0')}
-              href={`/projects/${project.id}`}
-              reveal
-              scramble
-            >
-              <p class="panel-tagline">{project.data.tagline}</p>
-              <p class="panel-desc">{project.data.description.slice(0, 120)}...</p>
-              <div class="panel-stack">
-                {project.data.stack.slice(0, 4).map((tech) => (
-                  <span class="tag">{tech}</span>
-                ))}
-                {project.data.stack.length > 4 && (
-                  <span class="tag">+{project.data.stack.length - 4}</span>
-                )}
-              </div>
-            </Panel>
-          ))
-        }
-      </div>
-
-      <a href="/projects" class="btn btn-outline" style="margin-top: 1rem;">
-        ls ./projects/all
-      </a>
+    <div class="hero-status">
+      <p class="pane-title">─ Status</p>
+      <dl class="kv">
+        <dt>Role</dt><dd>Full-stack engineer</dd>
+        <dt>Building</dt><dd class="status--in-progress">KekeOwn</dd>
+        <dt>Shipped</dt><dd class="status--shipped">VoiceDesk</dd>
+        <dt>Open to</dt><dd>Full-stack and backend roles</dd>
+      </dl>
     </div>
-  </section>
+  </Pane>
 
-  <section class="section" id="stack">
-    <div class="container">
-      <p class="section-label reveal">cat ./stack.txt</p>
-      <h2 class="section-title reveal">Stack</h2>
-
-      <div class="stack-grid">
-        <div class="card reveal">
-          <h3>backend</h3>
-          <div class="stack-tags">
-            <span class="tag">python 3.14</span>
-            <span class="tag">fastapi</span>
-            <span class="tag">sqlmodel</span>
-            <span class="tag">sqlalchemy 2</span>
-            <span class="tag">pydantic</span>
-            <span class="tag">postgresql</span>
-            <span class="tag">redis</span>
-            <span class="tag">alembic</span>
-          </div>
-        </div>
-        <div class="card reveal">
-          <h3>frontend</h3>
-          <div class="stack-tags">
-            <span class="tag">typescript</span>
-            <span class="tag">react 19</span>
-            <span class="tag">next.js</span>
-            <span class="tag">tailwind css</span>
-            <span class="tag">shadcn/ui</span>
-            <span class="tag">astro</span>
-          </div>
-        </div>
-        <div class="card reveal">
-          <h3>infrastructure</h3>
-          <div class="stack-tags">
-            <span class="tag">docker</span>
-            <span class="tag">docker compose</span>
-            <span class="tag">linux</span>
-            <span class="tag">bash</span>
-            <span class="tag">git</span>
-            <span class="tag">render</span>
-            <span class="tag">netlify</span>
-            <span class="tag">vercel</span>
-          </div>
-        </div>
-        <div class="card reveal">
-          <h3>testing & quality</h3>
-          <div class="stack-tags">
-            <span class="tag">pytest</span>
-            <span class="tag">ruff</span>
-            <span class="tag">basedpyright</span>
-            <span class="tag">playwright</span>
-            <span class="tag">uv</span>
-            <span class="tag">bun</span>
-          </div>
-        </div>
-        <div class="card reveal">
-          <h3>learning</h3>
-          <div class="stack-tags">
-            <span class="tag">data pipelines</span>
-            <span class="tag">cloud infra</span>
-            <span class="tag">agentic ai</span>
-            <span class="tag">llms</span>
-          </div>
-        </div>
-      </div>
+  <Pane id="now" variant="now" title="Currently working on ── cat ./now.txt">
+    <div class="now-head">
+      <h2 class="now-title">KekeOwn</h2>
+      <span class="muted small">Codename kekevest · team project</span>
+      <span class="status status--in-progress small">◐ In progress</span>
     </div>
-  </section>
+    <p>
+      A managed keke (tricycle) fleet and rider-ownership platform. Riders lease a keke and pay
+      their way to owning it; asset owners watch their vehicles and collections on a ledger nobody
+      can quietly edit.
+    </p>
+    <p class="secondary">
+      My part: the core domain tables, rider sign-up and office appointments, offers, contracts and
+      repayment schedules, the double-entry ledger, and the rider portal.
+    </p>
+    <ul class="tags" aria-label="KekeOwn stack">
+      <li class="tag">FastAPI</li>
+      <li class="tag">SQLModel</li>
+      <li class="tag">PostgreSQL + PostGIS</li>
+      <li class="tag">Next.js</li>
+      <li class="tag">TypeScript</li>
+      <li class="tag">Paystack</li>
+    </ul>
+  </Pane>
 
-  <section class="section" id="about">
-    <div class="container">
-      <p class="section-label reveal">cat ./about.txt</p>
-      <h2 class="section-title reveal">About</h2>
-      <div class="about-content">
-        <p>
-          I'm a full-stack engineer who cares about the unglamorous parts of building
-          software — the parts that keep systems running at 3 AM. Availability checks
-          that mean something. Price calculations the client can't manipulate.
-          Migrations you can actually roll back. Tests that catch the bug before
-          your user does.
-        </p>
-        <p>
-          My capstone project, <a href="/projects/naijastay">NaijaStay</a>, is a
-          hotel booking API that models real operational problems: temporary room
-          holds, double-booking prevention, role-based staff workflows, and a
-          booking lifecycle that doesn't fall apart at the edges.
-        </p>
-        <p>
-          Most recently I built <a href="/projects/voicedesk">VoiceDesk</a> end to end:
-          a FastAPI pipeline that transcribes, translates and drafts replies to
-          customer voice notes in Nigerian languages, and a Next.js + TypeScript
-          inbox where a human approves every reply before it goes out.
-        </p>
-        <p>
-          When I'm not writing APIs, I'm breaking and fixing things, debugging
-          late into the night, or lifting weights at the gym.
-        </p>
-      </div>
+  <Pane id="work" title={`Featured work ── ls -la ./projects ── ${featured.length}`}>
+    <div class="cards">
+      {featured.map((project, i) => <ProjectCard project={project} index={i + 1} detailed />)}
     </div>
-  </section>
+    <p class="small"><a href="/projects" class="hit">View all projects</a></p>
+  </Pane>
 
-  <script is:inline>
-    (function () {
-      var boot = document.querySelector('[data-boot]');
-      if (!boot) return;
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      var lines = Array.from(boot.querySelectorAll('[data-boot-line]'));
-      var texts = lines.map(function (el) { return el.innerHTML; });
-      lines.forEach(function (el) { el.innerHTML = '&nbsp;'; });
-      var li = 0;
-      function typeLine() {
-        if (li >= lines.length) return;
-        var full = texts[li].replace(/<[^>]*>/g, '');
-        var html = texts[li];
-        var isHtml = html !== full;
-        var target = isHtml ? html : full;
-        var ci = 0;
-        var timer = setInterval(function () {
-          ci++;
-          if (isHtml) {
-            lines[li].innerHTML = '<span class="boot-ok">' + full.slice(0, ci) + '</span>';
-          } else {
-            lines[li].textContent = full.slice(0, ci);
-          }
-          if (ci >= full.length) {
-            clearInterval(timer);
-            lines[li].innerHTML = texts[li];
-            li++;
-            setTimeout(typeLine, 220);
-          }
-        }, 18);
+  <div class="row">
+    <Pane id="about" title="About ── cat ./about.txt" class="grow">
+      <p>
+        I like building things end to end — the API, the database behind it, and the screen
+        someone actually taps. Most of what I know came from breaking something and refusing to
+        leave it broken, usually later at night than I'd admit.
+      </p>
+      <p>
+        Lately that's been <a href="/projects/voicedesk">VoiceDesk</a>. A lot of people here send
+        voice notes instead of typing, so I built an inbox that listens, translates and drafts a
+        reply, then waits for a real person to say yes before anything goes out.
+      </p>
+      <p>When I'm not at the keyboard, I'm usually at the gym.</p>
+    </Pane>
+
+    <Pane as="aside" id="contact" title="Contact" class="side">
+      <ul class="contact-list small">
+        <li><span class="muted">Email    </span><a class="hit" href="mailto:chukwuaugust0@gmail.com">chukwuaugust0@gmail.com</a></li>
+        <li><span class="muted">GitHub   </span><a class="hit" href="https://github.com/Austin-Deccentric" rel="noopener noreferrer">Austin-Deccentric</a></li>
+        <li><span class="muted">LinkedIn </span><a class="hit" href="https://www.linkedin.com/in/augustine-chukwu" rel="noopener noreferrer">augustine-chukwu</a></li>
+      </ul>
+      <a href="/contact" class="btn btn-primary contact-cta">Contact me</a>
+    </Pane>
+  </div>
+
+  <Pane id="stack" title="Stack ── cat ./stack.txt">
+    <div class="stack-cols">
+      {
+        homeStack.map((group) => (
+          <div class="stack-group">
+            <h3 class="muted small">{group.name}</h3>
+            <ul class="tags" aria-label={`${group.name} stack`}>
+              {group.items.map((item) => (
+                <li class="tag">{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))
       }
-      setTimeout(typeLine, 300);
-    })();
-  </script>
+    </div>
+  </Pane>
 </Base>
 
 <style>
-  .hero {
-    padding: 3.5rem 0 3rem;
+  /* .hero sits on the Pane root, outside this page's scope. */
+  :global(.pane.hero) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 32px;
   }
 
-  .terminal-block {
-    background: var(--bg-elevated);
+  .hero-main {
+    flex: 999 1 520px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .hero-title {
+    font-size: clamp(32px, 6vw, 48px);
+  }
+
+  .hero-lede {
+    font-size: 20px;
+  }
+
+  .hero-status {
+    flex: 1 1 260px;
+    align-self: flex-start;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-    line-height: 1.8;
-    overflow-x: auto;
-  }
-
-  .terminal-line {
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-
-  .terminal-output {
-    color: var(--text-secondary);
-  }
-
-  .terminal-cmd {
-    color: var(--text);
-  }
-
-  .hero-actions {
+    padding: 16px;
     display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 8px;
   }
 
-  .stack-grid {
+  .actions {
+    margin-top: 8px;
+  }
+
+  .now-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 16px;
+  }
+
+  .now-title {
+    font-size: 28px;
+  }
+
+  .stack-cols {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+    gap: var(--gap);
   }
 
-  .stack-grid h3 {
-    margin-bottom: 0.5rem;
-    font-size: 0.85rem;
-    text-transform: lowercase;
-    color: var(--text-muted);
-  }
-
-  .stack-tags {
+  .stack-group {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.15rem;
+    flex-direction: column;
+    gap: 4px;
   }
 
-  .about-content {
-    max-width: 620px;
+  .stack-group h3 {
+    font-weight: 400;
   }
 
-  .about-content p {
-    font-size: 0.9rem;
+  .contact-list {
+    display: flex;
+    flex-direction: column;
+    white-space: pre;
   }
 
-  @media (max-width: 640px) {
-    .hero {
-      padding: 2.5rem 0 2rem;
-    }
+  .contact-list a {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 
-    .terminal-block {
-      padding: 1rem;
-      font-size: 0.8rem;
-    }
+  .contact-cta {
+    align-self: flex-start;
+    margin-top: 8px;
   }
 </style>

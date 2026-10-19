@@ -7,7 +7,21 @@
   "status": "shipped",
   "featured": true,
   "live": "https://voice-desk-two.vercel.app",
-  "stack": ["FastAPI", "Next.js", "TypeScript", "PostgreSQL", "Tailwind CSS", "shadcn/ui", "SQLModel", "Alembic", "SSE", "Playwright", "Docker", "Bun", "uv"],
+  "stack": [
+    "FastAPI",
+    "Next.js",
+    "TypeScript",
+    "PostgreSQL",
+    "Tailwind CSS",
+    "shadcn/ui",
+    "SQLModel",
+    "Alembic",
+    "SSE",
+    "Playwright",
+    "Docker",
+    "Bun",
+    "uv"
+  ],
   "highlights": [
     "~6,100 LOC FastAPI backend and ~6,400 LOC Next.js + TypeScript frontend",
     "166 pytest tests against real Postgres plus 30 Playwright end-to-end tests with axe accessibility checks",
@@ -51,5 +65,36 @@
     "Spoken replies in the customer's language (TTS)",
     "Usage-based billing by minutes processed and agent seats"
   ],
+  "pipeline": [
+    {
+      "label": "Upload",
+      "kind": "io"
+    },
+    {
+      "label": "1 Transcribe",
+      "kind": "step"
+    },
+    {
+      "label": "2 Translate",
+      "kind": "step"
+    },
+    {
+      "label": "3 Tag intent",
+      "kind": "step"
+    },
+    {
+      "label": "4 Draft reply",
+      "kind": "step"
+    },
+    {
+      "label": "Human approves",
+      "kind": "gate"
+    },
+    {
+      "label": "Send",
+      "kind": "io"
+    }
+  ],
+  "pipelineNote": "Each step is keyed by (message_id, step). A failed step retries from where it stopped, so finished steps are never re-called or re-billed. Sending without an approval returns 409.",
   "order": 0
 }
