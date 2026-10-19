@@ -18,14 +18,15 @@ const {
 // for link previews to render.
 const ogImageUrl = ogImage ?? (Astro.site ? new URL('og-image.png', Astro.site).href : undefined);
 
-const path = Astro.url.pathname;
-const isHome = path === '/' || path === '';
-const isProjects = path === '/projects' || path.startsWith('/projects/');
-const isStack = path === '/stack';
-const isContact = path === '/contact';
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const tabs = [
+  { key: '1', label: 'home', short: 'home', href: '/', active: path === '/' },
+  { key: '2', label: 'projects', short: 'work', href: '/projects', active: path.startsWith('/projects') },
+  { key: '3', label: 'stack', short: 'stack', href: '/stack', active: path === '/stack' },
+  { key: '4', label: 'contact', short: 'mail', href: '/contact', active: path === '/contact' },
+];
 
-const segments = path.split('/').filter(Boolean);
-const displayPath = segments.length ? `~/${segments.join('/')}` : '~';
+const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
 ---
 
 <!doctype html>
@@ -51,107 +52,110 @@ const displayPath = segments.length ? `~/${segments.join('/')}` : '~';
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
     <script is:inline>
       (function () {
-        const stored = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = stored || (prefersDark ? 'dark' : 'light');
+        var stored = null;
+        try {
+          stored = localStorage.getItem('theme');
+        } catch (e) {}
+        var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
         document.documentElement.setAttribute('data-theme', theme);
       })();
     </script>
   </head>
   <body>
-    <div class="window-bar" aria-hidden="true">
-      <div class="window-dots">
-        <span class="window-dot window-dot--red"></span>
-        <span class="window-dot window-dot--yellow"></span>
-        <span class="window-dot window-dot--green"></span>
-      </div>
-      <span class="window-path">{displayPath}</span>
+    <a class="skip-link" href="#main">skip to content</a>
+
+    <div class="shell">
+      <nav class="tabs" aria-label="Primary">
+        {
+          tabs.map((tab) => (
+            <a
+              class="tab-link"
+              href={tab.href}
+              aria-current={tab.active ? 'page' : undefined}
+              aria-keyshortcuts={tab.key}
+            >
+              {tab.key}:{tab.label}
+            </a>
+          ))
+        }
+        <button class="tabs-end" id="theme-toggle" type="button" aria-keyshortcuts="t">
+          [t] theme: <span id="theme-label">dark</span>
+        </button>
+      </nav>
+
+      <main id="main" class="stack-v" style="gap: var(--gap)">
+        <slot />
+      </main>
+
+      <footer class="statusbar">
+        <span>
+          <span class="mode">NORMAL</span>
+          <span class="cell">{displayPath}</span>
+        </span>
+        <span>
+          <span class="cell hide-sm muted">open to full-stack &amp; backend roles</span>
+          <span class="cell">
+            <a href="https://github.com/Austin-Deccentric" rel="noopener noreferrer">gh</a>
+            · <a href="https://www.linkedin.com/in/augustine-chukwu" rel="noopener noreferrer">in</a>
+            · <a href="mailto:chukwuaugust0@gmail.com">mail</a>
+          </span>
+        </span>
+      </footer>
     </div>
 
-    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
-      <span id="theme-label">[dark]</span>
-    </button>
-
-    <nav class="nav">
-      <div class="container nav-inner">
-        <a href="/" class="nav-brand">~/chukwuaustin</a>
-        <div class="nav-links">
-          <a href="/#projects" class:list={[{ active: isProjects }]}>projects</a>
-          <a href="/#stack" class:list={[{ active: isStack }]}>stack</a>
-          <a href="/contact" class:list={[{ active: isContact }]}>contact</a>
-        </div>
-      </div>
+    <nav class="bottom-nav" aria-label="Primary, mobile">
+      {
+        tabs.map((tab) => (
+          <a href={tab.href} aria-current={tab.active ? 'page' : undefined}>
+            {tab.key}:{tab.short}
+          </a>
+        ))
+      }
     </nav>
 
-    <main>
-      <slot />
-    </main>
-
-    <footer class="footer">
-      <div class="container">
-        <pre class="footer-banner" aria-hidden="true"> ███  █   █  ███  █████  █  █   █
-█   █ █   █ █        █   █  ██  █
-█████ █   █  ███     █   █  █ █ █
-█   █ █   █     █    █   █  █  ██
-█   █  ███  ████     █   █  █   █</pre>
-        <span class="sr-only">Chukwu Austin</span>
-        <div class="footer-inner">
-          <p class="footer-text">exit code 0 · built with astro</p>
-          <div class="footer-links">
-            <a href="https://github.com/Austin-Deccentric" target="_blank" rel="noopener noreferrer">github</a>
-            <a href="https://www.linkedin.com/in/augustine-chukwu" target="_blank" rel="noopener noreferrer">linkedin</a>
-            <a href="mailto:chukwuaugust0@gmail.com">email</a>
-          </div>
-        </div>
-      </div>
-    </footer>
-
     <script is:inline>
-      const toggle = document.getElementById('theme-toggle');
-      const label = document.getElementById('theme-label');
-
-      function updateLabel() {
-        const theme = document.documentElement.getAttribute('data-theme');
-        label.textContent = theme === 'dark' ? '[light]' : '[dark]';
-      }
-
-      updateLabel();
-
-      toggle.addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme');
-        const next = current === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-        updateLabel();
-      });
-
       (function () {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        var GLYPHS = '░▒▓█<>/\\|─═+#*';
-        document.querySelectorAll('[data-scramble]').forEach(function (el) {
-          var original = el.textContent;
-          el.setAttribute('data-original', original);
-          var timer = null;
-          el.closest('a, .panel')?.addEventListener('mouseenter', function () {
-            if (timer) return;
-            var frames = 0;
-            timer = setInterval(function () {
-              frames++;
-              if (frames > 8) {
-                clearInterval(timer);
-                timer = null;
-                el.textContent = original;
-                return;
-              }
-              var out = '';
-              for (var i = 0; i < original.length; i++) {
-                out += original[i] === ' ' ? ' ' : GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
-              }
-              el.textContent = out;
-            }, 45);
-          });
+        var label = document.getElementById('theme-label');
+        var toggle = document.getElementById('theme-toggle');
+
+        function current() {
+          return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+        }
+
+        function setTheme(next) {
+          document.documentElement.setAttribute('data-theme', next);
+          try {
+            localStorage.setItem('theme', next);
+          } catch (e) {}
+          label.textContent = next;
+        }
+
+        label.textContent = current();
+        toggle.addEventListener('click', function () {
+          setTheme(current() === 'dark' ? 'light' : 'dark');
+        });
+
+        // Single-key shortcuts, matching the hints in the tab line.
+        var routes = { '1': '/', '2': '/projects', '3': '/stack', '4': '/contact' };
+        document.addEventListener('keydown', function (e) {
+          if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
+          var t = e.target;
+          if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+          if (routes[e.key]) {
+            window.location.href = routes[e.key];
+          } else if (e.key === 't') {
+            setTheme(current() === 'dark' ? 'light' : 'dark');
+          }
         });
       })();
     </script>

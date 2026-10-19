@@ -1,181 +1,228 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Panel from '../../components/Panel.astro';
-import { getCollection, render } from 'astro:content';
+import Pane from '../../components/Pane.astro';
+import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects');
-  return projects.map((project) => ({
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((project, i) => ({
     params: { slug: project.id },
-    props: { project },
+    props: { project, next: projects[(i + 1) % projects.length] },
   }));
 }
 
-const { project } = Astro.props;
-const { Content } = await render(project);
-const { title, tagline, description, role, year, status, repo, live, docs, stack, highlights, problem, constraints, architecture, decisions, next } = project.data;
+const { project, next: nextProject } = Astro.props;
+const {
+  title,
+  tagline,
+  description,
+  role,
+  year,
+  status,
+  repo,
+  live,
+  docs,
+  stack,
+  highlights,
+  problem,
+  constraints,
+  architecture,
+  decisions,
+  next,
+  pipeline,
+  pipelineNote,
+} = project.data;
+
+const statusGlyph = { shipped: '●', 'in-progress': '◐', coursework: '○' } as const;
 ---
 
 <Base title={`${title} — Chukwu Austin`} description={description}>
-  <article class="case-study">
-    <div class="container">
-      <a href="/projects" class="back-link">cd ..</a>
+  <nav aria-label="Breadcrumb" class="crumbs small muted">
+    <a href="/">~/portfolio</a><span aria-hidden="true">/</span><a href="/projects">projects</a><span
+      aria-hidden="true">/</span
+    ><span aria-current="page">{project.id}</span>
+  </nav>
 
-      <Panel title={title} status={status} meta={`${year} · ${role}`}>
-        <p class="case-tagline">{tagline}</p>
-        <p class="case-desc">{description}</p>
-
-        <div class="case-links">
-          {repo && (
-            <a href={repo} target="_blank" rel="noopener noreferrer" class="btn btn-outline">
-              ./view-source.sh
-            </a>
-          )}
-          {live && (
-            <a href={live} target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-              ./run-demo.sh
-            </a>
-          )}
-          {docs && (
-            <a href={docs} target="_blank" rel="noopener noreferrer" class="btn btn-outline">
-              ./api-docs.sh
-            </a>
-          )}
-        </div>
-
-        <div class="case-stack">
-          {stack.map((tech) => (
-            <span class="tag">{tech}</span>
-          ))}
-        </div>
-      </Panel>
-
-      {highlights.length > 0 && (
-        <section class="case-section reveal">
-          <h2>highlights</h2>
-          <ul>
-            {highlights.map((h) => (
-              <li>{h}</li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {problem && (
-        <section class="case-section reveal">
-          <h2>problem</h2>
-          <p>{problem}</p>
-        </section>
-      )}
-
-      {constraints.length > 0 && (
-        <section class="case-section reveal">
-          <h2>constraints</h2>
-          <ul>
-            {constraints.map((c) => (
-              <li>{c}</li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {architecture.length > 0 && (
-        <section class="case-section reveal">
-          <h2>architecture</h2>
-          <ul>
-            {architecture.map((a) => (
-              <li>{a}</li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {decisions.length > 0 && (
-        <section class="case-section reveal">
-          <h2>decisions</h2>
-          <ul>
-            {decisions.map((d) => (
-              <li>{d}</li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {next.length > 0 && (
-        <section class="case-section reveal">
-          <h2>todo</h2>
-          <ul>
-            {next.map((n) => (
-              <li>{n}</li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <div class="case-nav">
-        <a href="/projects" class="btn btn-outline">cd ./projects</a>
-        <a href="/contact" class="btn btn-primary">./contact.sh</a>
-      </div>
+  <Pane as="header" variant="active" loose>
+    <p class="small prompt-user">
+      ┌─ case study ── {year} ── <span class={`status status--${status}`}>{statusGlyph[status]} {status}</span>
+    </p>
+    <h1 class="case-title">{title}</h1>
+    <p class="case-tagline">{tagline}</p>
+    <p class="secondary">{description}</p>
+    <div class="actions">
+      {live && <a href={live} class="btn btn-primary" rel="noopener noreferrer">↗ open live</a>}
+      {docs && <a href={docs} class="btn" rel="noopener noreferrer">api docs</a>}
+      {repo && <a href={repo} class="btn" rel="noopener noreferrer">view source</a>}
+      <span class="btn role" aria-label={`Role: ${role}`}>role: {role.toLowerCase()}</span>
     </div>
-  </article>
+  </Pane>
+
+  {
+    pipeline.length > 0 && (
+      <Pane title="PIPELINE">
+        <ol class="pipeline">
+          {pipeline.map((stage, i) => (
+            <li class={`stage stage--${stage.kind}`}>
+              {i > 0 && <span class="arrow muted" aria-hidden="true">──▶</span>}
+              <span class="stage-box">{stage.label}</span>
+            </li>
+          ))}
+        </ol>
+        {pipelineNote && <p class="muted small">{pipelineNote}</p>}
+      </Pane>
+    )
+  }
+
+  {
+    problem && (
+      <Pane title="PROBLEM">
+        <p>{problem}</p>
+      </Pane>
+    )
+  }
+
+  {
+    (highlights.length > 0 || decisions.length > 0) && (
+      <div class="row">
+        {highlights.length > 0 && (
+          <Pane title="HIGHLIGHTS" class="half">
+            <ul class="bullets">
+              {highlights.map((h) => (
+                <li>{h}</li>
+              ))}
+            </ul>
+          </Pane>
+        )}
+        {decisions.length > 0 && (
+          <Pane title="DECISIONS" class="half">
+            <ul class="bullets bullets--decisions">
+              {decisions.map((d) => (
+                <li>{d}</li>
+              ))}
+            </ul>
+          </Pane>
+        )}
+      </div>
+    )
+  }
+
+  {
+    (constraints.length > 0 || architecture.length > 0) && (
+      <div class="row">
+        {constraints.length > 0 && (
+          <Pane title="CONSTRAINTS" class="half">
+            <ul class="bullets">
+              {constraints.map((c) => (
+                <li>{c}</li>
+              ))}
+            </ul>
+          </Pane>
+        )}
+        {architecture.length > 0 && (
+          <Pane title="ARCHITECTURE" class="half">
+            <ul class="bullets">
+              {architecture.map((a) => (
+                <li>{a}</li>
+              ))}
+            </ul>
+          </Pane>
+        )}
+      </div>
+    )
+  }
+
+  {
+    next.length > 0 && (
+      <Pane title="TODO">
+        <ul class="bullets bullets--todo">
+          {next.map((n) => (
+            <li>{n}</li>
+          ))}
+        </ul>
+      </Pane>
+    )
+  }
+
+  <Pane title="STACK">
+    <ul class="tags" aria-label={`${title} stack`}>
+      {stack.map((tech) => <li class="tag">{tech.toLowerCase()}</li>)}
+    </ul>
+  </Pane>
+
+  {
+    nextProject.id !== project.id && (
+      <p class="small">
+        <span class="muted">next:</span>
+        <a href={`/projects/${nextProject.id}`}>{nextProject.data.title} →</a>
+      </p>
+    )
+  }
 </Base>
 
 <style>
-  .case-study {
-    padding: 2rem 0 3rem;
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
-  .back-link {
-    display: inline-block;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
+  .crumbs [aria-current] {
+    color: var(--text-strong);
   }
 
-  .back-link:hover {
-    color: var(--green);
-  }
-
-  .case-header {
-    margin-bottom: 1.5rem;
+  .case-title {
+    font-size: clamp(36px, 7vw, 56px);
+    font-weight: 700;
   }
 
   .case-tagline {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.75rem;
+    font-size: 20px;
   }
 
-  .case-desc {
-    max-width: 620px;
-    margin-bottom: 1.25rem;
-    font-size: 0.9rem;
+  .actions {
+    margin-top: 6px;
   }
 
-  .case-links {
+  .role {
+    color: var(--muted);
+    cursor: default;
+  }
+
+  .role:hover {
+    color: var(--muted);
+    border-color: var(--border);
+  }
+
+  .pipeline {
+    list-style: none;
     display: flex;
-    gap: 0.5rem;
     flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
   }
 
-  .case-stack {
+  .stage {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.15rem;
-    margin: 1rem 0 0.25rem;
+    align-items: center;
+    gap: 10px;
   }
 
-  .case-nav {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 2.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
+  .stage-box {
+    border: 1px solid var(--border);
+    padding: 10px 14px;
   }
 
-  @media (max-width: 640px) {
-    .case-tagline {
-      font-size: 1rem;
-    }
+  .stage--step .stage-box {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .stage--gate .stage-box {
+    background: var(--yellow);
+    border-color: var(--yellow);
+    color: var(--on-accent);
+    font-weight: 700;
   }
 </style>

@@ -1,0 +1,20 @@
+---
+interface Props {
+  title?: string;
+  variant?: 'active' | 'now';
+  as?: 'section' | 'aside' | 'header' | 'div';
+  id?: string;
+  loose?: boolean;
+  class?: string;
+}
+
+const { title, variant, as: Tag = 'section', id, loose = false, class: className } = Astro.props;
+---
+
+<Tag
+  id={id}
+  class:list={['pane', variant && `pane--${variant}`, { 'pane--loose': loose }, className]}
+>
+  {title && <h2 class="pane-title">── {title}</h2>}
+  <slot />
+</Tag>
