@@ -1,79 +1,67 @@
 ---
 import Base from '../layouts/Base.astro';
-import Pane from '../components/Pane.astro';
 
 const channels = [
   {
-    cmd: '$ mail',
     name: 'Email',
     value: 'chukwuaugust0@gmail.com',
     href: 'mailto:chukwuaugust0@gmail.com',
-    note: 'Best for detailed messages and job opportunities',
+    note: 'Best for job opportunities, KekeVest conversations and detailed messages.',
   },
   {
-    cmd: '$ git remote -v',
-    name: 'GitHub',
-    value: 'github.com/Austin-Deccentric',
-    href: 'https://github.com/Austin-Deccentric',
-    note: 'Code, contributions and open source work',
-  },
-  {
-    cmd: '$ cat ./resume',
     name: 'LinkedIn',
     value: 'linkedin.com/in/augustine-chukwu-',
     href: 'https://www.linkedin.com/in/augustine-chukwu-/',
-    note: 'Professional profile and resume',
+    note: 'Professional profile, experience and recommendations.',
+  },
+  {
+    name: 'GitHub',
+    value: 'github.com/Austin-Deccentric',
+    href: 'https://github.com/Austin-Deccentric',
+    note: 'Code, case-study repos and open source work.',
   },
 ];
 ---
 
-<Base title="Contact — Chukwu Austin">
-  <Pane as="header" variant="active">
-    <p class="muted small">
-      <span class="prompt-user">austin@deccentric</span><span class="prompt-path">:~/portfolio$</span> ./contact.sh
+<Base title="Contact — Augustine Chukwu">
+  <header class="page-head container">
+    <p class="label">Contact</p>
+    <h1>Let's talk</h1>
+    <p class="lede">
+      I'm open to remote backend and AI engineering roles, and to conversations about KekeVest.
+      Whether you have an opportunity, a question, or just want to say hi, my inbox is open.
     </p>
-    <h1 class="page-title">Contact</h1>
-    <p class="secondary">
-      I'm open to full-stack and backend engineering roles. Whether you have an opportunity, a
-      question, or just want to say hi — my inbox is open.
-    </p>
-  </Pane>
+    <div class="actions">
+      <a href="mailto:chukwuaugust0@gmail.com" class="btn btn-primary">Email me</a>
+    </div>
+  </header>
 
-  <div class="contact-grid">
+  <div class="cards container">
     {
       channels.map((c) => (
-        <Pane title={c.name}>
-          <p class="prompt-user small">{c.cmd}</p>
+        <section class="card">
+          <h2 class="channel-title">{c.name}</h2>
           <a
             href={c.href}
-            class="contact-value"
+            class="hit channel-value"
             rel={c.href.startsWith('http') ? 'noopener noreferrer' : undefined}
           >
             {c.value}
           </a>
-          <p class="muted small">{c.note}</p>
-        </Pane>
+          <p class="muted">{c.note}</p>
+        </section>
       ))
     }
   </div>
 </Base>
 
 <style>
-  .page-title {
-    font-size: clamp(28px, 5vw, 40px);
+  .channel-title {
+    font-size: 24px;
   }
 
-  .contact-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-    gap: var(--gap);
-  }
-
-  .contact-value {
+  .channel-value {
     font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
     overflow-wrap: anywhere;
   }
 </style>

@@ -1,7 +1,7 @@
 {
   "title": "Iya Ngozi Kitchen",
   "tagline": "Multi-branch food ordering API",
-  "description": "A FastAPI + SQLModel service for a multi-branch Enugu restaurant: browse the menu per branch, register/sign in, place and track orders — plus staff-only dish and order management, role-gated.",
+  "description": "A FastAPI + SQLModel service for a multi-branch Nigerian restaurant: browse the menu per branch, register/sign in, place and track orders — plus staff-only dish and order management, role-gated.",
   "role": "Backend Engineer",
   "year": "2026",
   "status": "shipped",

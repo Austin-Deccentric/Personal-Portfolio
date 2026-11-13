@@ -1,201 +1,212 @@
 ---
+import { existsSync } from 'node:fs';
 import Base from '../layouts/Base.astro';
-import Pane from '../components/Pane.astro';
+import Section from '../components/Section.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
-import { stackGroups } from '../data/stack';
 
 const featured = (await getCollection('projects'))
   .filter((p) => p.data.featured)
   .sort((a, b) => a.data.order - b.data.order);
 
-const homeStack = stackGroups.filter((g) => g.name !== 'Learning');
+// The hero photo shows once public/photo.jpg is added; until then the hero is text only.
+const hasPhoto = existsSync(new URL('../../public/photo.jpg', import.meta.url));
 ---
 
-<Base title="Chukwu Austin — Full-Stack Engineer">
-  <Pane as="header" variant="active" loose class="hero">
+<Base title="Augustine (Austin) Chukwu — AI and backend engineer">
+  <section class:list={['hero container', { 'hero--photo': hasPhoto }]}>
     <div class="hero-main">
-      <p class="muted small">
-        [+] loading profile … [+] mounting ./projects … <span class="prompt-user">[✓] ready</span>
+      <p class="label">AI + backend engineer · Nigeria</p>
+      <h1>I build software for the businesses <span class="mark">big tech overlooks.</span></h1>
+      <p class="lede">
+        I'm Augustine, and friends call me Austin. I build backend and AI systems for African
+        businesses, from a voice-note inbox that understands Pidgin to a platform that helps keke
+        riders own their tricycle.
       </p>
-      <p>
-        <span class="prompt-user">austin@deccentric</span><span class="prompt-path">:~/portfolio$</span> whoami
-      </p>
-      <h1 class="hero-title">Full-stack engineer<span class="caret" aria-hidden="true">_</span></h1>
-      <p class="hero-lede">
-        I build APIs that don't break at 3AM — and the interfaces that sit on top of them.
-      </p>
-      <p class="muted">FastAPI · PostgreSQL · Next.js · TypeScript</p>
       <div class="actions">
-        <a href="#work" class="btn btn-primary">↵ View projects</a>
-        <a href="/contact" class="btn">Contact me</a>
+        <a href="#work" class="btn btn-primary">See my work</a>
+        <a href="/contact" class="btn btn-link">Get in touch</a>
       </div>
     </div>
+    {
+      hasPhoto && (
+        <img
+          class="hero-photo"
+          src="/photo.jpg"
+          width="800"
+          height="1000"
+          alt="Augustine Chukwu"
+          fetchpriority="high"
+        />
+      )
+    }
+  </section>
 
-    <div class="hero-status">
-      <p class="pane-title">─ Status</p>
-      <dl class="kv">
-        <dt>Role</dt><dd>Full-stack engineer</dd>
-        <dt>Building</dt><dd class="status--in-progress">KekeOwn</dd>
-        <dt>Shipped</dt><dd class="status--shipped">VoiceDesk</dd>
-        <dt>Open to</dt><dd>Full-stack and backend roles</dd>
-      </dl>
+  <section class="band" aria-labelledby="why-title">
+    <div class="why container">
+      <div class="why-head">
+        <p class="label">Why I build</p>
+        <h2 id="why-title">Software should work for the people in front of you.</h2>
+      </div>
+      <div class="prose why-body">
+        <p>
+          A shop owner gets voice notes all day, in Pidgin, Igbo and English, and answers every one
+          by hand. A keke rider pays every week for months, then loses the tricycle over two missed
+          payments, because nobody kept a record.
+        </p>
+        <p>
+          Most software isn't built with them in mind. I build for exactly these people: tools that
+          understand how they talk, keep honest records, and still work when the network doesn't.
+        </p>
+      </div>
     </div>
-  </Pane>
+  </section>
 
-  <Pane id="now" variant="now" title="Currently working on ── cat ./now.txt">
-    <div class="now-head">
-      <h2 class="now-title">KekeOwn</h2>
-      <span class="muted small">Codename kekevest · team project</span>
-      <span class="status status--in-progress small">◐ In progress</span>
+  <Section title="What brings you here?" class="container">
+    <div class="cards cards--2">
+      <div class="card">
+        <h3>Hiring an engineer</h3>
+        <p>Tested Python and FastAPI systems, with case studies showing how each one was built.</p>
+        <a href="/projects" class="hit card-link">See case studies →</a>
+      </div>
+      <div class="card">
+        <h3>Investing in KekeVest</h3>
+        <p>A fairer path to tricycle ownership, with every payment recorded.</p>
+        <a href="#kekevest" class="hit card-link">Read the KekeVest story →</a>
+      </div>
     </div>
-    <p>
-      A managed keke (tricycle) fleet and rider-ownership platform. Riders lease a keke and pay
-      their way to owning it; asset owners watch their vehicles and collections on a ledger nobody
-      can quietly edit.
-    </p>
-    <p class="secondary">
-      My part: the core domain tables, rider sign-up and office appointments, offers, contracts and
-      repayment schedules, the double-entry ledger, and the rider portal.
-    </p>
-    <ul class="tags" aria-label="KekeOwn stack">
-      <li class="tag">FastAPI</li>
-      <li class="tag">SQLModel</li>
-      <li class="tag">PostgreSQL + PostGIS</li>
-      <li class="tag">Next.js</li>
-      <li class="tag">TypeScript</li>
-      <li class="tag">Paystack</li>
-    </ul>
-  </Pane>
+  </Section>
 
-  <Pane id="work" title={`Featured work ── ls -la ./projects ── ${featured.length}`}>
-    <div class="cards">
-      {featured.map((project, i) => <ProjectCard project={project} index={i + 1} detailed />)}
+  <Section id="kekevest" eyebrow="Currently building" title="KekeVest" class="container">
+    <div class="card kv">
+      <div class="kv-head">
+        <span class="label muted">Co-founder and team lead</span>
+        <span class="pill pill--in-progress">Building</span>
+      </div>
+      <p class="kv-lede">
+        A managed keke (tricycle) fleet and rider-ownership platform. Riders lease a keke and pay
+        their way to owning it; asset owners watch their vehicles and collections on a ledger nobody
+        can quietly edit.
+      </p>
+      <p class="muted">
+        My part: the core domain tables, rider sign-up and office appointments, offers, contracts
+        and repayment schedules, the double-entry ledger, and the rider portal.
+      </p>
+      <ul class="tags" aria-label="KekeVest stack">
+        <li class="tag">FastAPI</li>
+        <li class="tag">SQLModel</li>
+        <li class="tag">PostgreSQL + PostGIS</li>
+        <li class="tag">Next.js</li>
+        <li class="tag">TypeScript</li>
+        <li class="tag">Paystack</li>
+      </ul>
+      <div class="actions">
+        <a href="https://www.kekevest.com/" class="btn" rel="noopener noreferrer">Visit kekevest.com ↗</a>
+      </div>
     </div>
-    <p class="small"><a href="/projects" class="hit">View all projects</a></p>
-  </Pane>
+  </Section>
 
-  <div class="row">
-    <Pane id="about" title="About ── cat ./about.txt" class="grow">
+  <Section id="work" title="Selected work" class="container">
+    <div class="cards cards--2">
+      {featured.map((project) => <ProjectCard project={project} detailed />)}
+    </div>
+    <p><a href="/projects" class="hit">See all projects →</a></p>
+  </Section>
+
+  <Section id="about" title="About" class="container">
+    <div class="prose">
       <p>
         I like building things end to end — the API, the database behind it, and the screen
-        someone actually taps. Most of what I know came from breaking something and refusing to
-        leave it broken, usually later at night than I'd admit.
+        someone actually taps. Before software, I spent five years turning data into decisions,
+        which is why I care so much about honest records and systems that don't break.
       </p>
       <p>
-        Lately that's been <a href="/projects/voicedesk">VoiceDesk</a>. A lot of people here send
-        voice notes instead of typing, so I built an inbox that listens, translates and drafts a
-        reply, then waits for a real person to say yes before anything goes out.
+        Most of what I know came from breaking something and refusing to leave it broken, usually
+        later at night than I'd admit. Lately that's been
+        <a href="/projects/voicedesk">VoiceDesk</a>. A lot of people here send voice notes instead
+        of typing, so I built an inbox that listens, translates and drafts a reply, then waits for a
+        real person to say yes before anything goes out.
       </p>
-      <p>When I'm not at the keyboard, I'm usually at the gym.</p>
-    </Pane>
-
-    <Pane as="aside" id="contact" title="Contact" class="side">
-      <ul class="contact-list small">
-        <li><span class="muted">Email    </span><a class="hit" href="mailto:chukwuaugust0@gmail.com">chukwuaugust0@gmail.com</a></li>
-        <li><span class="muted">GitHub   </span><a class="hit" href="https://github.com/Austin-Deccentric" rel="noopener noreferrer">Austin-Deccentric</a></li>
-        <li><span class="muted">LinkedIn </span><a class="hit" href="https://www.linkedin.com/in/augustine-chukwu-/" rel="noopener noreferrer">augustine-chukwu-</a></li>
-      </ul>
-      <a href="/contact" class="btn btn-primary contact-cta">Contact me</a>
-    </Pane>
-  </div>
-
-  <Pane id="stack" title="Stack ── cat ./stack.txt">
-    <div class="stack-cols">
-      {
-        homeStack.map((group) => (
-          <div class="stack-group">
-            <h3 class="muted small">{group.name}</h3>
-            <ul class="tags" aria-label={`${group.name} stack`}>
-              {group.items.map((item) => (
-                <li class="tag">{item}</li>
-              ))}
-            </ul>
-          </div>
-        ))
-      }
+      <p>Friends call me Austin. When I'm not at the keyboard, I'm usually at the gym.</p>
     </div>
-  </Pane>
+  </Section>
 </Base>
 
 <style>
-  /* .hero sits on the Pane root, outside this page's scope. */
-  :global(.pane.hero) {
-    flex-direction: row;
+  .hero {
+    display: flex;
     flex-wrap: wrap;
-    gap: 32px;
+    align-items: center;
+    gap: 48px;
+    padding-top: 32px;
   }
 
   .hero-main {
-    flex: 999 1 520px;
+    flex: 999 1 480px;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .hero:not(.hero--photo) .hero-main {
+    max-width: 820px;
+  }
+
+  .hero-photo {
+    flex: 1 1 300px;
+    max-width: 400px;
+    aspect-ratio: 4 / 5;
+    height: auto;
+    object-fit: cover;
+    border-radius: 20px;
+    background: var(--blue);
+  }
+
+  .why {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px 48px;
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  .why-head {
+    flex: 1 1 260px;
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
 
-  .hero-title {
-    font-size: clamp(32px, 6vw, 48px);
+  .why-body {
+    flex: 999 1 460px;
+    min-width: 0;
+    font-size: 18px;
   }
 
-  .hero-lede {
-    font-size: 20px;
+  .card-link {
+    margin-top: auto;
+    font-weight: 600;
   }
 
-  .hero-status {
-    flex: 1 1 260px;
-    align-self: flex-start;
-    border: 1px solid var(--border);
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .actions {
-    margin-top: 8px;
-  }
-
-  .now-head {
+  .kv-head {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
-    gap: 8px 16px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
   }
 
-  .now-title {
-    font-size: 28px;
+  .kv-lede {
+    font-size: 18px;
+    max-width: 68ch;
   }
 
-  .stack-cols {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
-    gap: var(--gap);
+  .kv .muted {
+    max-width: 68ch;
   }
 
-  .stack-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .stack-group h3 {
-    font-weight: 400;
-  }
-
-  .contact-list {
-    display: flex;
-    flex-direction: column;
-    white-space: pre;
-  }
-
-  .contact-list a {
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
-
-  .contact-cta {
-    align-self: flex-start;
+  .kv .actions {
     margin-top: 8px;
   }
 </style>

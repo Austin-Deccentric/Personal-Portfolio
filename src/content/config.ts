@@ -7,6 +7,8 @@ const projects = defineCollection({
     tagline: z.string(),
     description: z.string(),
     role: z.string(),
+    // Short label on project cards, e.g. AI or Backend.
+    category: z.string().default('Backend'),
     year: z.string(),
     status: z.enum(['shipped', 'in-progress', 'coursework']),
     featured: z.boolean().default(false),
