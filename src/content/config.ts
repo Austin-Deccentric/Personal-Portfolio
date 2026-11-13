@@ -5,6 +5,8 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string(),
     tagline: z.string(),
+    // One human sentence for the homepage route; falls back to the tagline.
+    pitch: z.string().optional(),
     description: z.string(),
     role: z.string(),
     // Short label on project cards, e.g. AI or Backend.

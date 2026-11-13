@@ -1,6 +1,7 @@
 {
   "title": "Book Store API",
   "tagline": "Async book store with Docker deployment",
+  "pitch": "An async book store API with authors, books and full CRUD, packaged with Docker and ready to deploy.",
   "description": "A book store API built with FastAPI, SQLModel (async), and PostgreSQL. Full book CRUD with author foreign-key validation, session-cookie auth, and a production-shaped Docker setup.",
   "role": "Backend Engineer",
   "year": "2026",

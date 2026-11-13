@@ -1,9 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
 ---
 
 <Base title="Page not found — Augustine Chukwu">
-  <header class="page-head page-head--roomy container">
+  <Masthead slot="masthead">
     <p class="label">404</p>
     <h1>This page doesn't exist</h1>
     <p class="lede">It may have moved, or the link has a typo. Pick somewhere to go:</p>
@@ -12,6 +13,6 @@ import Base from '../layouts/Base.astro';
       <a href="/projects" class="btn">Browse projects</a>
       <a href="/contact" class="btn">Contact me</a>
     </div>
-  </header>
+  </Masthead>
 </Base>
 

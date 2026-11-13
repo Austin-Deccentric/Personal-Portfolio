@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
 import Section from '../components/Section.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
@@ -14,14 +15,14 @@ const filters = (Object.keys(statusInfo) as (keyof typeof statusInfo)[])
 ---
 
 <Base title="Projects — Augustine Chukwu">
-  <header class="page-head container">
+  <Masthead slot="masthead">
     <p class="label">Work</p>
     <h1>All projects</h1>
     <p class="lede">
       Backend and AI systems I've built, from a voice-note inbox and a hotel booking API to
       smaller coursework projects. Each one has a case study on how it was built.
     </p>
-  </header>
+  </Masthead>
 
   <Section class="container">
     <h2 class="sr-only">Project list</h2>

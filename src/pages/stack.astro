@@ -1,17 +1,18 @@
 ---
 import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
 import { stackGroups } from '../data/stack';
 ---
 
 <Base title="Stack — Augustine Chukwu">
-  <header class="page-head container">
+  <Masthead slot="masthead">
     <p class="label">Stack</p>
     <h1>The tools I build with</h1>
     <p class="lede">
       What I reach for when building backend and AI systems, and the frontends that sit on top of
       them.
     </p>
-  </header>
+  </Masthead>
 
   <div class="cards container">
     {

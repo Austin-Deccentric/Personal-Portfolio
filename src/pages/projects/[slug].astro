@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Masthead from '../../components/Masthead.astro';
 import Section from '../../components/Section.astro';
 import { getCollection } from 'astro:content';
 import { statusInfo } from '../../data/status';
@@ -38,27 +39,29 @@ const {
 ---
 
 <Base title={`${title} — Augustine Chukwu`} description={description}>
-  <nav aria-label="Breadcrumb" class="crumbs container small">
-    <a class="hit" href="/">Home</a><span aria-hidden="true">/</span><a class="hit" href="/projects">Projects</a><span
-      aria-hidden="true">/</span
-    ><span aria-current="page">{title}</span>
-  </nav>
+  <Masthead slot="masthead">
+    <nav aria-label="Breadcrumb" class="crumbs small">
+      <a class="hit" href="/">Home</a><span aria-hidden="true">/</span><a class="hit" href="/projects">Projects</a><span
+        aria-hidden="true">/</span
+      ><span aria-current="page">{title}</span>
+    </nav>
 
-  <header class="case-head container">
-    <p class="case-meta">
-      <span class="label muted">Case study · {category} · {year}</span>
-      <span class={`pill pill--${status}`}>{statusInfo[status].label}</span>
-    </p>
-    <h1>{title}</h1>
-    <p class="case-tagline">{tagline}</p>
-    <p class="lede muted">{description}</p>
-    <div class="actions">
-      {live && <a href={live} class="btn btn-primary" rel="noopener noreferrer">Open the live site ↗</a>}
-      {docs && <a href={docs} class="btn" rel="noopener noreferrer">Read API docs</a>}
-      {repo && <a href={repo} class="btn" rel="noopener noreferrer">View source</a>}
+    <div class="case-head">
+      <p class="case-meta">
+        <span class="label">Case study · {category} · {year}</span>
+        <span class={`pill pill--${status}`}>{statusInfo[status].label}</span>
+      </p>
+      <h1>{title}</h1>
+      <p class="case-tagline">{tagline}</p>
+      <p class="case-desc">{description}</p>
+      <div class="actions">
+        {live && <a href={live} class="btn btn-primary" rel="noopener noreferrer">Open the live site ↗</a>}
+        {docs && <a href={docs} class="btn" rel="noopener noreferrer">Read API docs</a>}
+        {repo && <a href={repo} class="btn" rel="noopener noreferrer">View source</a>}
+      </div>
+      <p class="role"><span class="label">Role</span> {role}</p>
     </div>
-    <p class="role"><span class="label muted">Role</span> {role}</p>
-  </header>
+  </Masthead>
 
   {
     pipeline.length > 0 && (
@@ -172,7 +175,6 @@ const {
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    color: var(--muted);
   }
 
   .crumbs [aria-current] {
@@ -183,7 +185,6 @@ const {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    margin-top: -48px;
   }
 
   .case-meta {
@@ -194,9 +195,16 @@ const {
   }
 
   .case-tagline {
-    font-size: 21px;
-    font-weight: 500;
-    max-width: 60ch;
+    font-size: 22px;
+    font-weight: 600;
+    max-width: 50ch;
+    color: var(--text);
+  }
+
+  .case-desc {
+    font-size: 18px;
+    max-width: 64ch;
+    color: var(--text);
   }
 
   .role {

@@ -1,4 +1,6 @@
-/* Augustine Chukwu brand: warm white, deep blue, keke gold (60 / 30 / 10). */
+/* Augustine Chukwu brand, "Keke" direction: keke gold mastheads, deep blue
+   type and road, warm white pages. Heavy Inter for headlines, Fraunces italic
+   for the one human word, JetBrains Mono for labels and stickers. */
 
 :root {
   --bg: #faf6ef;
@@ -24,6 +26,8 @@
   --max-width: 1120px;
   --gutter: 24px;
   --radius: 16px;
+  --header-h: 80px;
+  --road-h: 56px;
 
   color-scheme: light;
 }
@@ -61,7 +65,8 @@ p,
 ul,
 ol,
 dl,
-dd {
+dd,
+figure {
   margin: 0;
 }
 
@@ -74,24 +79,34 @@ ol {
 h1,
 h2,
 h3 {
-  font-family: var(--serif);
-  font-weight: 600;
+  font-family: var(--sans);
+  font-weight: 800;
   color: var(--blue);
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  line-height: 1;
+  letter-spacing: -0.035em;
 }
 
 h1 {
-  font-size: clamp(36px, 6vw, 56px);
-  line-height: 1.08;
+  font-size: clamp(52px, 9vw, 116px);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
 }
 
 h2 {
-  font-size: clamp(28px, 4vw, 34px);
+  font-size: clamp(34px, 5vw, 48px);
 }
 
 h3 {
-  font-size: 22px;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+/* The one human word in a headline. */
+.accent {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 a {
@@ -104,7 +119,7 @@ a:hover {
 }
 
 :focus-visible {
-  outline: 2px solid var(--blue);
+  outline: 3px solid var(--blue);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -156,35 +171,62 @@ img {
 main {
   display: flex;
   flex-direction: column;
-  gap: 72px;
+  gap: 80px;
+  padding-top: 72px;
   padding-bottom: 24px;
 }
 
-/* Opening block on inner pages: label, h1, lede, optional actions. */
-.page-head {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding-top: 32px;
+#main:focus {
+  outline: none;
 }
 
-.page-head--roomy {
+/* Gold top of every page: the header, then the page's masthead, then the road. */
+.top {
+  background: var(--gold);
+  color: var(--blue);
+}
+
+.masthead {
+  position: relative;
+}
+
+.masthead-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   padding-top: 48px;
+  padding-bottom: 72px;
+}
+
+/* Blue road with a dashed centre line closes every masthead. */
+.road {
+  position: relative;
+  z-index: 1;
+  height: var(--road-h);
+  background-color: var(--blue);
+  background-image: repeating-linear-gradient(90deg, rgba(250, 246, 239, 0.85) 0 56px, transparent 56px 84px);
+  background-size: 100% 6px;
+  background-position: 0 center;
+  background-repeat: no-repeat;
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
 }
 
 .section-head {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
 }
 
-/* Full-width deep blue band, used once per page at most. */
+/* Full-width deep blue band. */
 .band {
   background: var(--blue);
   color: var(--on-blue);
@@ -220,16 +262,6 @@ main {
   gap: 24px;
 }
 
-.grow {
-  flex: 999 1 560px;
-  min-width: 0;
-}
-
-.side {
-  flex: 1 1 300px;
-  min-width: 0;
-}
-
 .half {
   flex: 1 1 420px;
   min-width: 0;
@@ -237,7 +269,7 @@ main {
 
 .card {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: var(--radius);
   padding: 28px;
   display: flex;
@@ -247,12 +279,11 @@ main {
 
 /* ── text helpers ─────────────────────────────────────── */
 
-/* Small monospace label: the one engineer's touch the brand keeps. */
 .label {
   font-family: var(--mono);
   font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--blue);
 }
@@ -266,8 +297,14 @@ main {
 }
 
 .lede {
-  font-size: 19px;
-  max-width: 60ch;
+  font-size: 21px;
+  line-height: 1.5;
+  font-weight: 500;
+  max-width: 36ch;
+}
+
+.top .lede {
+  color: var(--text);
 }
 
 .prose {
@@ -277,15 +314,25 @@ main {
   max-width: 68ch;
 }
 
-/* Gold underline highlight, used on one phrase per page. */
-.mark {
-  box-shadow: inset 0 -0.22em 0 var(--gold);
-}
-
 .hit {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+}
+
+/* Tilted mono label, used sparingly as a sticker. */
+.sticker {
+  display: inline-block;
+  background: var(--blue);
+  color: var(--on-blue);
+  font-family: var(--mono);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  border-radius: 8px;
+  transform: rotate(6deg);
+  white-space: nowrap;
 }
 
 /* ── buttons ──────────────────────────────────────────── */
@@ -302,15 +349,15 @@ main {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 48px;
-  padding: 0 22px;
-  border-radius: 10px;
-  border: 1.5px solid var(--blue);
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 999px;
+  border: 2px solid var(--blue);
   background: transparent;
   color: var(--blue);
   font: inherit;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
   cursor: pointer;
 }
@@ -320,17 +367,15 @@ main {
   color: var(--on-blue);
 }
 
-/* The single gold call to action on a page. */
 .btn-primary {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: var(--text);
+  background: var(--blue);
+  color: var(--on-blue);
 }
 
 .btn-primary:hover {
-  background: var(--gold-hover);
-  border-color: var(--gold-hover);
-  color: var(--text);
+  background: var(--blue-hover);
+  border-color: var(--blue-hover);
+  color: var(--on-blue);
 }
 
 .btn-link {
@@ -408,37 +453,40 @@ main {
   width: 8px;
   height: 8px;
   margin-top: 0.62em;
-  border-radius: 2px;
-  background: var(--blue);
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--blue);
 }
 
 .bullets--decisions li::before {
-  background: transparent;
-  border: 2px solid var(--blue);
+  background: var(--surface);
 }
 
 .bullets--todo li::before {
-  height: 2px;
+  width: 10px;
+  height: 3px;
   margin-top: 0.8em;
+  border-radius: 2px;
   background: var(--muted);
+  box-shadow: none;
 }
 
 /* ── chrome: header and footer ────────────────────────── */
 
 .site-header {
+  position: relative;
+  z-index: 2;
+  height: var(--header-h);
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px 24px;
-  padding-top: 16px;
-  padding-bottom: 16px;
 }
 
 .wordmark {
   font-family: var(--serif);
-  font-weight: 600;
-  font-size: 22px;
+  font-weight: 700;
+  font-size: 21px;
   color: var(--blue);
   text-decoration: none;
 }
@@ -446,9 +494,10 @@ main {
 .nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 24px;
-  font-size: 16px;
-  font-weight: 500;
+  align-items: center;
+  gap: 0 28px;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .nav a {
@@ -459,12 +508,25 @@ main {
 }
 
 .nav a[aria-current='page'] {
-  box-shadow: inset 0 -2px 0 var(--blue);
+  box-shadow: inset 0 -3px 0 var(--blue);
+}
+
+.nav .nav-cta {
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--blue);
+  color: var(--on-blue);
+}
+
+.nav .nav-cta:hover {
+  background: var(--blue-hover);
+  color: var(--on-blue);
 }
 
 .site-footer {
-  border-top: 1px solid var(--border);
-  margin-top: 48px;
+  margin-top: 56px;
+  background: var(--blue);
+  color: var(--on-blue);
 }
 
 .site-footer-inner {
@@ -473,22 +535,36 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: 16px 24px;
-  padding-top: 48px;
-  padding-bottom: 48px;
+  padding-top: 56px;
+  padding-bottom: 56px;
 }
 
 .footer-title {
-  font-family: var(--serif);
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--blue);
+  font-weight: 800;
+  font-size: clamp(34px, 5vw, 48px);
+  letter-spacing: -0.035em;
+  line-height: 1;
+  color: var(--on-blue);
+}
+
+.footer-note {
+  color: #d3dae4;
+  margin-top: 8px;
 }
 
 .footer-links {
   display: flex;
   flex-wrap: wrap;
   gap: 0 24px;
-  font-weight: 600;
+  font-weight: 700;
+}
+
+.footer-links a {
+  color: var(--on-blue);
+}
+
+.footer-links a:hover {
+  color: var(--gold);
 }
 
 /* ── narrow screens ───────────────────────────────────── */
@@ -496,6 +572,7 @@ main {
 @media (max-width: 767.98px) {
   :root {
     --gutter: 16px;
+    --road-h: 40px;
   }
 
   body {
@@ -504,13 +581,30 @@ main {
 
   main {
     gap: 56px;
+    padding-top: 48px;
   }
 
-  .card {
-    padding: 20px;
+  .site-header {
+    height: auto;
+    flex-wrap: wrap;
+    padding-top: 12px;
+    padding-bottom: 8px;
   }
 
   .nav {
     gap: 0 16px;
+  }
+
+  .masthead-inner {
+    padding-top: 24px;
+    padding-bottom: 48px;
+  }
+
+  .lede {
+    font-size: 18px;
+  }
+
+  .card {
+    padding: 20px;
   }
 }

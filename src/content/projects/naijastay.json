@@ -1,6 +1,7 @@
 {
   "title": "NaijaStay",
   "tagline": "Hotel booking & operations API",
+  "pitch": "Hotel bookings that never double-sell a room and confirm each payment exactly once, even when the provider retries.",
   "description": "A backend API for managing hotel rooms, guests, staff, bookings, availability, and day-to-day hotel operations. Built around the practical problems of a real hotel: room availability, temporary holds, booking conflicts, staff permissions, check-in/check-out workflows, housekeeping states, caching, rate limiting, and migrations.",
   "role": "Backend Engineer",
   "year": "2026",

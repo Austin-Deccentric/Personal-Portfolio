@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
 
 const channels = [
   {
@@ -24,7 +25,7 @@ const channels = [
 ---
 
 <Base title="Contact — Augustine Chukwu">
-  <header class="page-head container">
+  <Masthead slot="masthead">
     <p class="label">Contact</p>
     <h1>Let's talk</h1>
     <p class="lede">
@@ -34,7 +35,7 @@ const channels = [
     <div class="actions">
       <a href="mailto:chukwuaugust0@gmail.com" class="btn btn-primary">Email me</a>
     </div>
-  </header>
+  </Masthead>
 
   <div class="cards container">
     {
