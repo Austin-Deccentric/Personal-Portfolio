@@ -1,44 +1,38 @@
 ---
 import Base from '../layouts/Base.astro';
-import Pane from '../components/Pane.astro';
+import Masthead from '../components/Masthead.astro';
 import { stackGroups } from '../data/stack';
 ---
 
-<Base title="Stack — Chukwu Austin">
-  <Pane as="header" variant="active">
-    <p class="muted small">
-      <span class="prompt-user">austin@deccentric</span><span class="prompt-path">:~/portfolio$</span> cat ./stack.txt
+<Base title="Stack — Augustine Chukwu">
+  <Masthead slot="masthead">
+    <p class="label">Stack</p>
+    <h1>The tools I build with</h1>
+    <p class="lede">
+      What I reach for when building backend and AI systems, and the frontends that sit on top of
+      them.
     </p>
-    <h1 class="page-title">Stack</h1>
-    <p class="secondary">
-      The tools I reach for when building backend systems and the frontends that sit on top of them.
-    </p>
-  </Pane>
+  </Masthead>
 
-  <div class="stack-grid">
+  <div class="cards container">
     {
       stackGroups.map((group) => (
-        <Pane title={group.name}>
-          <p class="muted small">{group.desc}</p>
+        <section class="card">
+          <h2 class="group-title">{group.name}</h2>
+          <p class="muted">{group.desc}</p>
           <ul class="tags" aria-label={`${group.name} stack`}>
             {group.items.map((item) => (
               <li class="tag">{item}</li>
             ))}
           </ul>
-        </Pane>
+        </section>
       ))
     }
   </div>
 </Base>
 
 <style>
-  .page-title {
-    font-size: clamp(28px, 5vw, 40px);
-  }
-
-  .stack-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
-    gap: var(--gap);
+  .group-title {
+    font-size: 24px;
   }
 </style>

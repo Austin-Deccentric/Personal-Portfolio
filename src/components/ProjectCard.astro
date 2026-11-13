@@ -4,42 +4,34 @@ import { statusInfo } from '../data/status';
 
 interface Props {
   project: CollectionEntry<'projects'>;
-  index: number;
   detailed?: boolean;
 }
 
-const { project, index, detailed = false } = Astro.props;
-const { title, tagline, description, year, status, stack } = project.data;
+const { project, detailed = false } = Astro.props;
+const { title, tagline, description, year, status, stack, category } = project.data;
 const shownStack = stack.slice(0, 4);
-const status_ = statusInfo[status];
 ---
 
-<article class="pcard" data-status={status}>
-  <p class="pcard-meta small">
-    <span class="muted">{String(index).padStart(2, '0')} · {year}</span>
-    <span class={`status status--${status}`}>{status_.glyph} {status_.label}</span>
+<article class="card pcard" data-status={status}>
+  <p class="pcard-meta">
+    <span class="label muted">{category} · {year}</span>
+    <span class={`pill pill--${status}`}>{statusInfo[status].label}</span>
   </p>
   <h3 class="pcard-title">
     <a href={`/projects/${project.id}`} class="pcard-link">{title}</a>
   </h3>
-  <p class="secondary">{tagline}</p>
-  {detailed && <p class="pcard-desc">{description}</p>}
+  <p class="pcard-tagline">{tagline}</p>
+  {detailed && <p class="pcard-desc muted">{description}</p>}
   <ul class="tags" aria-label={`${title} stack`}>
     {shownStack.map((tech) => <li class="tag">{tech}</li>)}
-    {stack.length > shownStack.length && <li class="muted">+{stack.length - shownStack.length}</li>}
+    {stack.length > shownStack.length && <li class="tag">+{stack.length - shownStack.length}</li>}
   </ul>
-  <p class="pcard-cta small" aria-hidden="true">Read case study →</p>
+  <p class="pcard-cta" aria-hidden="true">Read the case study →</p>
 </article>
 
 <style>
   .pcard {
     position: relative;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
   }
 
   .pcard[hidden] {
@@ -48,21 +40,21 @@ const status_ = statusInfo[status];
 
   .pcard:hover,
   .pcard:focus-within {
-    border-color: var(--green);
+    border-color: var(--blue);
   }
 
   .pcard-meta {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 12px;
   }
 
   .pcard-title {
-    font-size: 24px;
+    font-size: 26px;
   }
 
   .pcard-link {
-    color: var(--text-strong);
     text-decoration: none;
   }
 
@@ -71,6 +63,7 @@ const status_ = statusInfo[status];
     content: "";
     position: absolute;
     inset: 0;
+    border-radius: var(--radius);
   }
 
   .pcard-link:focus-visible {
@@ -78,11 +71,16 @@ const status_ = statusInfo[status];
   }
 
   .pcard:has(.pcard-link:focus-visible) {
-    outline: 2px solid var(--green);
+    outline: 2px solid var(--blue);
     outline-offset: 3px;
   }
 
+  .pcard-tagline {
+    font-weight: 500;
+  }
+
   .pcard-desc {
+    font-size: 16px;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -91,6 +89,8 @@ const status_ = statusInfo[status];
 
   .pcard-cta {
     margin-top: auto;
-    color: var(--green);
+    padding-top: 4px;
+    font-weight: 600;
+    color: var(--blue);
   }
 </style>

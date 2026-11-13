@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://chukwuaugust.netlify.app/sitemap-index.xml
+Sitemap: https://chukwuaugust.tech/sitemap-index.xml

@@ -1,0 +1,17 @@
+---
+// Gold page opener: page heading content in the slot, then the blue road.
+// An optional "art" slot sits behind the content (the homepage photo).
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={['masthead', className]}>
+  <slot name="art" />
+  <div class="masthead-inner container">
+    <slot />
+  </div>
+  <div class="road" aria-hidden="true"></div>
+</div>

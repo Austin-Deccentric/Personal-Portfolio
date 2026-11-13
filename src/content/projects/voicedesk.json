@@ -1,8 +1,10 @@
 {
   "title": "VoiceDesk",
   "tagline": "Voice-note inbox with AI agent assist",
+  "pitch": "Voice notes in Pidgin, Yorùbá, Igbo and Hausa, transcribed, translated and answered, with a human approving every reply.",
   "description": "A full-stack voice-note inbox for small Nigerian businesses. Customer voice notes in Pidgin, Yorùbá, Igbo, Hausa or English are transcribed, translated, tagged by intent, and answered with a draft grounded in the business's own approved answers. A human approves every reply before it is sent.",
-  "role": "Full-Stack Engineer",
+  "role": "Designer and engineer, end to end",
+  "category": "AI",
   "year": "2026",
   "status": "shipped",
   "featured": true,

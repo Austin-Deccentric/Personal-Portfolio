@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
-import Pane from '../components/Pane.astro';
+import Masthead from '../components/Masthead.astro';
+import Section from '../components/Section.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 import { statusInfo } from '../data/status';
@@ -13,36 +14,35 @@ const filters = (Object.keys(statusInfo) as (keyof typeof statusInfo)[])
   .filter((f) => f.count > 0);
 ---
 
-<Base title="Projects — Chukwu Austin">
-  <Pane as="header" variant="active">
-    <p class="muted small">
-      <span class="prompt-user">austin@deccentric</span><span class="prompt-path">:~/portfolio$</span> ls -la ./projects
+<Base title="Projects — Augustine Chukwu">
+  <Masthead slot="masthead">
+    <p class="label">Work</p>
+    <h1>All projects</h1>
+    <p class="lede">
+      Backend and AI systems I've built, from a voice-note inbox and a hotel booking API to
+      smaller coursework projects. Each one has a case study on how it was built.
     </p>
-    <h1 class="page-title">All projects</h1>
-    <p class="secondary">
-      Full-stack apps, APIs and tools I've built — from a voice-note inbox and a hotel booking
-      system to smaller coursework projects.
-    </p>
-  </Pane>
+  </Masthead>
 
-  <Pane title={`Projects ── ${projects.length}`}>
+  <Section class="container">
+    <h2 class="sr-only">Project list</h2>
     <div class="filters" role="group" aria-label="Filter projects by status" data-filters hidden>
       <button type="button" class="btn filter" aria-pressed="true" data-filter="all">
-        All <span class="muted">{projects.length}</span>
+        All <span class="count">{projects.length}</span>
       </button>
       {
         filters.map((f) => (
           <button type="button" class="btn filter" aria-pressed="false" data-filter={f.key}>
-            {f.label} <span class="muted">{f.count}</span>
+            {f.label} <span class="count">{f.count}</span>
           </button>
         ))
       }
     </div>
     <p class="sr-only" aria-live="polite" data-filter-status></p>
-    <div class="cards">
-      {projects.map((project, i) => <ProjectCard project={project} index={i + 1} />)}
+    <div class="cards cards--2">
+      {projects.map((project) => <ProjectCard project={project} detailed />)}
     </div>
-  </Pane>
+  </Section>
 </Base>
 
 <script is:inline>
@@ -72,10 +72,6 @@ const filters = (Object.keys(statusInfo) as (keyof typeof statusInfo)[])
 </script>
 
 <style>
-  .page-title {
-    font-size: clamp(28px, 5vw, 40px);
-  }
-
   .filters {
     display: flex;
     flex-wrap: wrap;
@@ -87,11 +83,26 @@ const filters = (Object.keys(statusInfo) as (keyof typeof statusInfo)[])
   }
 
   .filter {
-    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+    border-color: var(--border);
+    background: var(--surface);
+  }
+
+  .filter:hover {
+    border-color: var(--blue);
+    background: var(--surface);
+    color: var(--blue);
   }
 
   .filter[aria-pressed='true'] {
-    border-color: var(--green);
-    color: var(--green);
+    background: var(--blue);
+    border-color: var(--blue);
+    color: var(--on-blue);
+  }
+
+  .count {
+    font-weight: 500;
+    opacity: 0.75;
   }
 </style>

@@ -9,7 +9,7 @@ import '../styles/global.css';
 
 const {
   title,
-  description = 'Full-stack engineer building production-shaped APIs with FastAPI and PostgreSQL, and the Next.js + TypeScript frontends on top of them.',
+  description = 'AI and backend engineer building software for African businesses · Python, FastAPI, PostgreSQL · Co-founder, KekeVest',
   ogImage,
 } = Astro.props;
 
@@ -19,14 +19,11 @@ const {
 const ogImageUrl = ogImage ?? (Astro.site ? new URL('og-image.png', Astro.site).href : undefined);
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const tabs = [
-  { key: '1', label: 'Home', short: 'Home', href: '/', active: path === '/' },
-  { key: '2', label: 'Projects', short: 'Work', href: '/projects', active: path.startsWith('/projects') },
-  { key: '3', label: 'Stack', short: 'Stack', href: '/stack', active: path === '/stack' },
-  { key: '4', label: 'Contact', short: 'Contact', href: '/contact', active: path === '/contact' },
+const nav = [
+  { label: 'Work', href: '/projects', active: path.startsWith('/projects') },
+  { label: 'About', href: '/#about', active: false },
+  { label: 'Stack', href: '/stack', active: path === '/stack' },
 ];
-
-const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
 ---
 
 <!doctype html>
@@ -36,12 +33,13 @@ const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#F2A33A" />
     <title>{title}</title>
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Chukwu Austin — Full-Stack Engineer" />
+    <meta property="og:site_name" content="Augustine Chukwu" />
     {Astro.url && <meta property="og:url" content={Astro.url.href} />}
     {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
     <meta name="twitter:card" content="summary_large_image" />
@@ -55,142 +53,48 @@ const displayPath = path === '/' ? '~/portfolio' : `~/portfolio${path}`;
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap"
       rel="stylesheet"
     />
-
-    <script is:inline>
-      (function () {
-        var stored = null;
-        try {
-          stored = localStorage.getItem('theme');
-        } catch (e) {}
-        var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-        var theme = stored || (prefersLight ? 'light' : 'dark');
-        document.documentElement.setAttribute('data-theme', theme);
-      })();
-    </script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <div class="shell">
-      <nav class="tabs" aria-label="Primary">
-        {
-          tabs.map((tab) => (
-            <a
-              class="tab-link"
-              href={tab.href}
-              aria-current={tab.active ? 'page' : undefined}
-              aria-keyshortcuts={tab.key}
-            >
-              <span class="key" aria-hidden="true">{tab.key}</span>
-              {tab.label}
-            </a>
-          ))
-        }
-        <span class="tabs-end-group">
-          <button id="keys-toggle" type="button" aria-pressed="true">
-            <span id="keys-label">Turn off</span> shortcuts
-          </button>
-          <button id="theme-toggle" type="button" aria-keyshortcuts="t">
-            <span class="key" aria-hidden="true">t</span> Switch to <span id="theme-label">light</span>
-          </button>
-        </span>
-      </nav>
-
-      <main id="main" class="stack-v" style="gap: var(--gap)">
-        <slot />
-      </main>
-
-      <footer class="statusbar">
-        <span>
-          <span class="mode">NORMAL</span>
-          <span class="cell">{displayPath}</span>
-        </span>
-        <span>
-          <span class="cell hide-sm muted">Open to full-stack and backend roles</span>
-          <span class="cell">
-            <a href="https://github.com/Austin-Deccentric" rel="noopener noreferrer">GitHub</a>
-            · <a href="https://www.linkedin.com/in/augustine-chukwu-/" rel="noopener noreferrer">LinkedIn</a>
-            · <a href="mailto:chukwuaugust0@gmail.com">Email</a>
-          </span>
-        </span>
-      </footer>
+    <div class="top">
+      <header class="site-header container">
+        <a class="wordmark hit" href="/">Augustine Chukwu</a>
+        <nav class="nav" aria-label="Primary">
+          {
+            nav.map((item) => (
+              <a href={item.href} aria-current={item.active ? 'page' : undefined}>
+                {item.label}
+              </a>
+            ))
+          }
+          <a class="nav-cta" href="/contact" aria-current={path === '/contact' ? 'page' : undefined}>Say hello</a>
+        </nav>
+      </header>
+      <div id="main" tabindex="-1">
+        <slot name="masthead" />
+      </div>
     </div>
 
-    <nav class="bottom-nav" aria-label="Primary, mobile">
-      {
-        tabs.map((tab) => (
-          <a href={tab.href} aria-current={tab.active ? 'page' : undefined}>
-            {tab.short}
-          </a>
-        ))
-      }
-    </nav>
+    <main>
+      <slot />
+    </main>
 
-    <script is:inline>
-      (function () {
-        var label = document.getElementById('theme-label');
-        var toggle = document.getElementById('theme-toggle');
-
-        function current() {
-          return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-        }
-
-        function other(theme) {
-          return theme === 'dark' ? 'light' : 'dark';
-        }
-
-        function setTheme(next) {
-          document.documentElement.setAttribute('data-theme', next);
-          try {
-            localStorage.setItem('theme', next);
-          } catch (e) {}
-          label.textContent = other(next);
-        }
-
-        label.textContent = other(current());
-        toggle.addEventListener('click', function () {
-          setTheme(other(current()));
-        });
-
-        // Single-key shortcuts, matching the hints in the tab line. They can be
-        // turned off (WCAG 2.1.4), and the choice is remembered.
-        var keysToggle = document.getElementById('keys-toggle');
-        var keysLabel = document.getElementById('keys-label');
-        var keysOn = true;
-        try {
-          keysOn = localStorage.getItem('shortcuts') !== 'off';
-        } catch (e) {}
-
-        function renderKeys() {
-          keysToggle.setAttribute('aria-pressed', String(keysOn));
-          keysLabel.textContent = keysOn ? 'Turn off' : 'Turn on';
-          toggle.setAttribute('aria-keyshortcuts', keysOn ? 't' : '');
-        }
-
-        renderKeys();
-        keysToggle.addEventListener('click', function () {
-          keysOn = !keysOn;
-          try {
-            localStorage.setItem('shortcuts', keysOn ? 'on' : 'off');
-          } catch (e) {}
-          renderKeys();
-        });
-
-        var routes = { '1': '/', '2': '/projects', '3': '/stack', '4': '/contact' };
-        document.addEventListener('keydown', function (e) {
-          if (!keysOn || e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
-          var t = e.target;
-          if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
-          if (routes[e.key]) {
-            window.location.href = routes[e.key];
-          } else if (e.key === 't') {
-            setTheme(other(current()));
-          }
-        });
-      })();
-    </script>
+    <footer class="site-footer" id="contact">
+      <div class="site-footer-inner container">
+        <div>
+          <p class="footer-title">Let's talk.</p>
+          <p class="footer-note">Open to remote backend and AI roles, and conversations about KekeVest.</p>
+        </div>
+        <ul class="footer-links">
+          <li><a class="hit" href="mailto:chukwuaugust0@gmail.com">Email</a></li>
+          <li><a class="hit" href="https://www.linkedin.com/in/augustine-chukwu-/" rel="noopener noreferrer">LinkedIn</a></li>
+          <li><a class="hit" href="https://github.com/Austin-Deccentric" rel="noopener noreferrer">GitHub</a></li>
+        </ul>
+      </div>
+    </footer>
   </body>
 </html>

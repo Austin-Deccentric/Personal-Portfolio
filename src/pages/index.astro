@@ -1,201 +1,405 @@
 ---
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import Base from '../layouts/Base.astro';
-import Pane from '../components/Pane.astro';
-import ProjectCard from '../components/ProjectCard.astro';
+import Masthead from '../components/Masthead.astro';
+import Section from '../components/Section.astro';
 import { getCollection } from 'astro:content';
-import { stackGroups } from '../data/stack';
+import { statusInfo } from '../data/status';
 
 const featured = (await getCollection('projects'))
   .filter((p) => p.data.featured)
   .sort((a, b) => a.data.order - b.data.order);
 
-const homeStack = stackGroups.filter((g) => g.name !== 'Learning');
+// The route: featured projects as stops, with KekeVest as the second stop.
+const projectStops = featured.map((p) => ({
+  meta: `${p.data.category} · ${statusInfo[p.data.status].label}`,
+  title: p.data.title,
+  line: p.data.pitch ?? p.data.tagline,
+  href: `/projects/${p.id}`,
+  lit: p.data.status === 'shipped',
+}));
+const stops = [
+  ...projectStops.slice(0, 1),
+  {
+    meta: 'Startup · Live',
+    title: 'KekeVest',
+    line: 'Riders pay weekly and end up owning their keke. Owners see every payment. Nobody loses a tricycle over a missing record.',
+    href: '#kekevest',
+    lit: true,
+  },
+  ...projectStops.slice(1),
+].map((stop, i) => ({ ...stop, no: String(i + 1).padStart(2, '0') }));
+
+// The hero photo shows once public/photo.jpg exists; without it the hero is text only.
+const hasPhoto = existsSync(join(process.cwd(), 'public', 'photo.jpg'));
 ---
 
-<Base title="Chukwu Austin — Full-Stack Engineer">
-  <Pane as="header" variant="active" loose class="hero">
-    <div class="hero-main">
-      <p class="muted small">
-        [+] loading profile … [+] mounting ./projects … <span class="prompt-user">[✓] ready</span>
-      </p>
-      <p>
-        <span class="prompt-user">austin@deccentric</span><span class="prompt-path">:~/portfolio$</span> whoami
-      </p>
-      <h1 class="hero-title">Full-stack engineer<span class="caret" aria-hidden="true">_</span></h1>
-      <p class="hero-lede">
-        I build APIs that don't break at 3AM — and the interfaces that sit on top of them.
-      </p>
-      <p class="muted">FastAPI · PostgreSQL · Next.js · TypeScript</p>
-      <div class="actions">
-        <a href="#work" class="btn btn-primary">↵ View projects</a>
-        <a href="/contact" class="btn">Contact me</a>
-      </div>
-    </div>
-
-    <div class="hero-status">
-      <p class="pane-title">─ Status</p>
-      <dl class="kv">
-        <dt>Role</dt><dd>Full-stack engineer</dd>
-        <dt>Building</dt><dd class="status--in-progress">KekeOwn</dd>
-        <dt>Shipped</dt><dd class="status--shipped">VoiceDesk</dd>
-        <dt>Open to</dt><dd>Full-stack and backend roles</dd>
-      </dl>
-    </div>
-  </Pane>
-
-  <Pane id="now" variant="now" title="Currently working on ── cat ./now.txt">
-    <div class="now-head">
-      <h2 class="now-title">KekeOwn</h2>
-      <span class="muted small">Codename kekevest · team project</span>
-      <span class="status status--in-progress small">◐ In progress</span>
-    </div>
-    <p>
-      A managed keke (tricycle) fleet and rider-ownership platform. Riders lease a keke and pay
-      their way to owning it; asset owners watch their vehicles and collections on a ledger nobody
-      can quietly edit.
-    </p>
-    <p class="secondary">
-      My part: the core domain tables, rider sign-up and office appointments, offers, contracts and
-      repayment schedules, the double-entry ledger, and the rider portal.
-    </p>
-    <ul class="tags" aria-label="KekeOwn stack">
-      <li class="tag">FastAPI</li>
-      <li class="tag">SQLModel</li>
-      <li class="tag">PostgreSQL + PostGIS</li>
-      <li class="tag">Next.js</li>
-      <li class="tag">TypeScript</li>
-      <li class="tag">Paystack</li>
-    </ul>
-  </Pane>
-
-  <Pane id="work" title={`Featured work ── ls -la ./projects ── ${featured.length}`}>
-    <div class="cards">
-      {featured.map((project, i) => <ProjectCard project={project} index={i + 1} detailed />)}
-    </div>
-    <p class="small"><a href="/projects" class="hit">View all projects</a></p>
-  </Pane>
-
-  <div class="row">
-    <Pane id="about" title="About ── cat ./about.txt" class="grow">
-      <p>
-        I like building things end to end — the API, the database behind it, and the screen
-        someone actually taps. Most of what I know came from breaking something and refusing to
-        leave it broken, usually later at night than I'd admit.
-      </p>
-      <p>
-        Lately that's been <a href="/projects/voicedesk">VoiceDesk</a>. A lot of people here send
-        voice notes instead of typing, so I built an inbox that listens, translates and drafts a
-        reply, then waits for a real person to say yes before anything goes out.
-      </p>
-      <p>When I'm not at the keyboard, I'm usually at the gym.</p>
-    </Pane>
-
-    <Pane as="aside" id="contact" title="Contact" class="side">
-      <ul class="contact-list small">
-        <li><span class="muted">Email    </span><a class="hit" href="mailto:chukwuaugust0@gmail.com">chukwuaugust0@gmail.com</a></li>
-        <li><span class="muted">GitHub   </span><a class="hit" href="https://github.com/Austin-Deccentric" rel="noopener noreferrer">Austin-Deccentric</a></li>
-        <li><span class="muted">LinkedIn </span><a class="hit" href="https://www.linkedin.com/in/augustine-chukwu-/" rel="noopener noreferrer">augustine-chukwu-</a></li>
-      </ul>
-      <a href="/contact" class="btn btn-primary contact-cta">Contact me</a>
-    </Pane>
-  </div>
-
-  <Pane id="stack" title="Stack ── cat ./stack.txt">
-    <div class="stack-cols">
-      {
-        homeStack.map((group) => (
-          <div class="stack-group">
-            <h3 class="muted small">{group.name}</h3>
-            <ul class="tags" aria-label={`${group.name} stack`}>
-              {group.items.map((item) => (
-                <li class="tag">{item}</li>
-              ))}
-            </ul>
+<Base title="Augustine (Austin) Chukwu — AI and backend engineer">
+  <Masthead slot="masthead" class:list={['hero', { 'hero--photo': hasPhoto }]}>
+    {
+      hasPhoto && (
+        <Fragment slot="art">
+          <div class="hero-photo">
+            <img src="/photo.jpg" width="900" height="1125" alt="Augustine Chukwu" fetchpriority="high" />
           </div>
+          <span class="sticker hero-sticker">Co-founder · KekeVest</span>
+        </Fragment>
+      )
+    }
+    <h1>Software that goes where <span class="accent">people</span> actually go.</h1>
+    <p class="lede">
+      I'm Augustine (Austin). I build backend and AI systems for the shops, riders and small
+      businesses big tech drives past.
+    </p>
+    <div class="actions">
+      <a href="#work" class="btn btn-primary">See the route</a>
+      <a href="/contact" class="btn btn-link">Get in touch</a>
+    </div>
+  </Masthead>
+
+  <Section id="work" class="container">
+    <div class="section-head">
+      <h2>The route so far</h2>
+      <span class="label muted">{stops.length} stops · more coming</span>
+    </div>
+    <ol class="route">
+      {
+        stops.map((stop) => (
+          <li class="stop">
+            <span class="stop-rail" aria-hidden="true">
+              <span class:list={['stop-dot', { 'stop-dot--lit': stop.lit }]} />
+            </span>
+            <a class="stop-body" href={stop.href}>
+              <span class="label muted">Stop {stop.no} · {stop.meta}</span>
+              <span class="stop-title">{stop.title} →</span>
+              <span class="stop-line">{stop.line}</span>
+            </a>
+          </li>
         ))
       }
+    </ol>
+    <p><a href="/projects" class="btn">See all projects</a></p>
+  </Section>
+
+  <section class="band" aria-labelledby="why-title">
+    <div class="why container">
+      <div class="why-head">
+        <p class="label">Why I build</p>
+        <h2 id="why-title">Software should work for the <span class="accent">people</span> in front of you.</h2>
+      </div>
+      <div class="prose why-body">
+        <p>
+          A shop owner gets voice notes all day, in Pidgin, Igbo and English, and answers every one
+          by hand. A keke rider pays every week for months, then loses the tricycle over two missed
+          payments, because nobody kept a record.
+        </p>
+        <p>
+          Most software isn't built with them in mind. I build for exactly these people: tools that
+          understand how they talk, keep honest records, and still work when the network doesn't.
+        </p>
+      </div>
     </div>
-  </Pane>
+  </section>
+
+  <Section class="container">
+    <h2>What brings you here?</h2>
+    <div class="cards cards--2">
+      <div class="card">
+        <h3>Hiring an engineer</h3>
+        <p>Tested Python and FastAPI systems, with case studies showing how each one was built.</p>
+        <a href="/projects" class="hit card-link">See case studies →</a>
+      </div>
+      <div class="card">
+        <h3>Investing in KekeVest</h3>
+        <p>A fairer path to tricycle ownership, with every payment recorded.</p>
+        <a href="#kekevest" class="hit card-link">Read the KekeVest story →</a>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="kekevest" class="container">
+    <div class="kv">
+      <div class="kv-head">
+        <p class="label">Currently building</p>
+        <h2>KekeVest</h2>
+        <span class="sticker kv-sticker">Co-founder &amp; team lead</span>
+      </div>
+      <p class="kv-lede">
+        A managed keke (tricycle) fleet and rider-ownership platform. Riders lease a keke and pay
+        their way to owning it; asset owners watch their vehicles and collections on a ledger nobody
+        can quietly edit.
+      </p>
+      <p class="muted kv-part">
+        My part: the core domain tables, rider sign-up and office appointments, offers, contracts
+        and repayment schedules, the double-entry ledger, and the rider portal.
+      </p>
+      <ul class="tags" aria-label="KekeVest stack">
+        <li class="tag">FastAPI</li>
+        <li class="tag">SQLModel</li>
+        <li class="tag">PostgreSQL + PostGIS</li>
+        <li class="tag">Next.js</li>
+        <li class="tag">TypeScript</li>
+        <li class="tag">Paystack</li>
+      </ul>
+      <div class="actions">
+        <a href="https://www.kekevest.com/" class="btn btn-primary" rel="noopener noreferrer">Visit kekevest.com ↗</a>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="about" class="container">
+    <h2>About</h2>
+    <div class="prose">
+      <p>
+        I like building things end to end — the API, the database behind it, and the screen
+        someone actually taps. Before software, I spent five years turning data into decisions,
+        which is why I care so much about honest records and systems that don't break.
+      </p>
+      <p>
+        Most of what I know came from breaking something and refusing to leave it broken, usually
+        later at night than I'd admit. Lately that's been
+        <a href="/projects/voicedesk">VoiceDesk</a>. A lot of people here send voice notes instead
+        of typing, so I built an inbox that listens, translates and drafts a reply, then waits for a
+        real person to say yes before anything goes out.
+      </p>
+      <p>Friends call me Austin. When I'm not at the keyboard, I'm usually at the gym.</p>
+    </div>
+  </Section>
 </Base>
 
 <style>
-  /* .hero sits on the Pane root, outside this page's scope. */
-  :global(.pane.hero) {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 32px;
+  /* The masthead root and its slots render inside the Masthead component. */
+  :global(.hero h1) {
+    max-width: 860px;
   }
 
-  .hero-main {
-    flex: 999 1 520px;
+  :global(.hero--photo .masthead-inner) {
+    padding-bottom: 96px;
+  }
+
+  /* Photo on the right, fading left into the gold behind the headline.
+     Black and white, multiplied onto the gold so it takes the page's colour. */
+  .hero-photo {
+    position: absolute;
+    right: 0;
+    top: calc(-1 * var(--header-h));
+    bottom: var(--road-h);
+    width: min(620px, 50%);
+    background: var(--gold);
+    overflow: hidden;
+    /* Fades in from the left and from under the header, so nav links stay on clean gold. */
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.85) 48%, #000 70%),
+      linear-gradient(to bottom, transparent 0, transparent calc(var(--header-h) - 16px), #000 calc(var(--header-h) + 96px));
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.85) 48%, #000 70%),
+      linear-gradient(to bottom, transparent 0, transparent calc(var(--header-h) - 16px), #000 calc(var(--header-h) + 96px));
+    mask-composite: intersect;
+  }
+
+  .hero-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 18%;
+    filter: grayscale(1) contrast(1.15) brightness(1.05);
+    mix-blend-mode: multiply;
+  }
+
+  .hero-sticker {
+    position: absolute;
+    z-index: 1;
+    right: 96px;
+    top: 24px;
+  }
+
+  .route {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stop {
+    display: flex;
+    gap: 28px;
+  }
+
+  .stop-rail {
+    flex-shrink: 0;
+    width: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Dashed road between stops; the last stop has none. */
+  .stop-rail::after {
+    content: "";
+    flex-grow: 1;
+    border-left: 4px dashed var(--blue);
+  }
+
+  .stop:last-child .stop-rail::after {
+    border-color: transparent;
+  }
+
+  .stop-dot {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 4px solid var(--blue);
+    background: var(--bg);
+  }
+
+  .stop-dot--lit {
+    background: var(--gold);
+  }
+
+  .stop-body {
+    flex-grow: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 4px 0 40px;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .stop-title {
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--blue);
+  }
+
+  .stop-body:hover .stop-title {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+  }
+
+  .stop-line {
+    font-size: 18px;
+    max-width: 62ch;
+  }
+
+  .why {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px 56px;
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+
+  .why-head {
+    flex: 1 1 300px;
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
 
-  .hero-title {
-    font-size: clamp(32px, 6vw, 48px);
+  .why-body {
+    flex: 999 1 460px;
+    min-width: 0;
+    font-size: 18px;
+    color: #e4e9f0;
   }
 
-  .hero-lede {
-    font-size: 20px;
+  .card-link {
+    margin-top: auto;
+    font-weight: 700;
   }
 
-  .hero-status {
-    flex: 1 1 260px;
-    align-self: flex-start;
-    border: 1px solid var(--border);
-    padding: 16px;
+  .kv {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 40px;
+    border-radius: 24px;
+    background: var(--gold);
+  }
+
+  .kv-head {
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
 
-  .actions {
-    margin-top: 8px;
+  .kv-sticker {
+    position: absolute;
+    right: 40px;
+    top: 40px;
   }
 
-  .now-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 8px 16px;
+  .kv-lede {
+    font-size: 20px;
+    font-weight: 500;
+    max-width: 60ch;
   }
 
-  .now-title {
-    font-size: 28px;
+  .kv-part {
+    max-width: 68ch;
+    color: var(--text);
   }
 
-  .stack-cols {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
-    gap: var(--gap);
+  .kv .tag {
+    background: rgba(250, 246, 239, 0.7);
+    border-color: rgba(18, 53, 91, 0.25);
+    color: var(--text);
   }
 
-  .stack-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
+  @media (max-width: 767.98px) {
+    /* On phones the photo sits on top and fades down into the headline. */
+    :global(.hero--photo .masthead-inner) {
+      padding-top: 290px;
+      padding-bottom: 48px;
+    }
 
-  .stack-group h3 {
-    font-weight: 400;
-  }
+    /* The fade ends before the headline starts, so the text sits on plain gold. */
+    .hero-photo {
+      top: 0;
+      bottom: auto;
+      width: 100%;
+      height: 380px;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 64px, #000 30%, transparent 76%);
+      mask-image: linear-gradient(to bottom, transparent 0, #000 64px, #000 30%, transparent 76%);
+    }
 
-  .contact-list {
-    display: flex;
-    flex-direction: column;
-    white-space: pre;
-  }
+    .hero-sticker {
+      right: 16px;
+      top: 16px;
+      font-size: 12px;
+      padding: 8px 12px;
+    }
 
-  .contact-list a {
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
+    .stop {
+      gap: 16px;
+    }
 
-  .contact-cta {
-    align-self: flex-start;
-    margin-top: 8px;
+    .stop-rail {
+      width: 32px;
+    }
+
+    .stop-dot {
+      width: 28px;
+      height: 28px;
+      border-width: 3px;
+    }
+
+    .kv {
+      padding: 24px;
+    }
+
+    .kv-sticker {
+      position: static;
+      align-self: flex-start;
+      transform: rotate(-3deg);
+      font-size: 12px;
+      padding: 8px 12px;
+    }
   }
 </style>

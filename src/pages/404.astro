@@ -1,31 +1,18 @@
 ---
 import Base from '../layouts/Base.astro';
-import Pane from '../components/Pane.astro';
+import Masthead from '../components/Masthead.astro';
 ---
 
-<Base title="404 — No such file or directory">
-  <Pane as="header" variant="active" loose>
-    <p>
-      <span class="prompt-user">austin@deccentric</span><span class="prompt-path">:~/portfolio$</span> cat {Astro.url.pathname}
-    </p>
-    <p class="error">cat: {Astro.url.pathname}: No such file or directory</p>
-    <p>
-      <span class="prompt-user">austin@deccentric</span><span class="prompt-path">:~/portfolio$</span>
-      <span class="caret" aria-hidden="true">_</span>
-    </p>
-    <h1 class="sr-only">Page not found</h1>
-    <p class="muted">That page doesn't exist or has moved. Pick somewhere to go:</p>
+<Base title="Page not found — Augustine Chukwu">
+  <Masthead slot="masthead">
+    <p class="label">404</p>
+    <h1>This page doesn't exist</h1>
+    <p class="lede">It may have moved, or the link has a typo. Pick somewhere to go:</p>
     <div class="actions">
       <a href="/" class="btn btn-primary">Go home</a>
       <a href="/projects" class="btn">Browse projects</a>
       <a href="/contact" class="btn">Contact me</a>
     </div>
-  </Pane>
+  </Masthead>
 </Base>
 
-<style>
-  .error {
-    color: var(--magenta);
-    overflow-wrap: anywhere;
-  }
-</style>

@@ -1,6 +1,6 @@
-// Display label and glyph for each project status.
+// Status labels shown on project pills; the key doubles as the pill modifier class.
 export const statusInfo = {
-  shipped: { glyph: '●', label: 'Shipped' },
-  'in-progress': { glyph: '◐', label: 'In progress' },
-  coursework: { glyph: '○', label: 'Coursework' },
+  shipped: { label: 'Shipped' },
+  'in-progress': { label: 'In progress' },
+  coursework: { label: 'Coursework' },
 } as const;

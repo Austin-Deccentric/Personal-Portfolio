@@ -5,6 +5,6 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   output: 'static',
   adapter: netlify(),
-  site: 'https://chukwuaugust.netlify.app',
+  site: 'https://chukwuaugust.tech',
   integrations: [sitemap()],
 });
