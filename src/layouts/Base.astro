@@ -48,6 +48,7 @@ const nav = [
     {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -62,7 +63,13 @@ const nav = [
 
     <div class="top">
       <header class="site-header container">
-        <a class="wordmark hit" href="/">Augustine Chukwu</a>
+        <a class="wordmark hit" href="/">
+          <svg class="wordmark-mark" viewBox="10 6 100 104" aria-hidden="true" focusable="false">
+            <path fill-rule="evenodd" d="M12 108 C12 64 36 30 60 8 C84 30 108 64 108 108 Z M40 108 C40 80 48 62 60 50 C72 62 80 80 80 108 Z" fill="var(--blue)" />
+            <path d="M40 108 C40 80 48 62 60 50 C72 62 80 80 80 108 Z" fill="var(--bg)" />
+          </svg>
+          Augustine Chukwu
+        </a>
         <nav class="nav" aria-label="Primary">
           {
             nav.map((item) => (

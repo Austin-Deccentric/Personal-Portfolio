@@ -484,11 +484,21 @@ main {
 }
 
 .wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--serif);
   font-weight: 700;
   font-size: 21px;
   color: var(--blue);
   text-decoration: none;
+}
+
+/* Open Door mark: on the gold header the doorway shows warm white. */
+.wordmark-mark {
+  width: 28px;
+  height: 29px;
+  flex-shrink: 0;
 }
 
 .nav {
