@@ -1,5 +1,5 @@
-/* Augustine Chukwu brand, "Keke" direction: keke gold mastheads, deep blue
-   type and road, warm white pages. Heavy Inter for headlines, Fraunces italic
+/* Augustine Chukwu brand, "Open Door" direction: warm white pages, deep blue
+   type and road, terracotta as a small (~10%) accent. Heavy Inter for headlines, Fraunces italic
    for the one human word, JetBrains Mono for labels and stickers. */
 
 :root {
@@ -10,8 +10,12 @@
   --muted: #4a5568;
   --blue: #12355b;
   --blue-hover: #0b2440;
-  --gold: #f2a33a;
-  --gold-hover: #e8922a;
+  --accent: #b5532f;
+  --accent-hover: #9a4426;
+  --on-accent: #ffffff;
+  /* Lighter terracotta for small text on deep blue (5.3:1). */
+  --accent-on-blue: #e8956f;
+  --accent-tint: #f5e6dc;
   --on-blue: #faf6ef;
   --green: #1f6b55;
   --green-bg: #e3f1ec;
@@ -103,6 +107,7 @@ h3 {
 
 /* The one human word in a headline. */
 .accent {
+  color: var(--accent);
   font-family: var(--serif);
   font-style: italic;
   font-weight: 500;
@@ -180,9 +185,9 @@ main {
   outline: none;
 }
 
-/* Gold top of every page: the header, then the page's masthead, then the road. */
+/* Warm white top of every page: the header, then the page's masthead, then the road. */
 .top {
-  background: var(--gold);
+  background: var(--bg);
   color: var(--blue);
 }
 
@@ -242,7 +247,11 @@ main {
 }
 
 .band .label {
-  color: var(--gold);
+  color: var(--accent-on-blue);
+}
+
+.band .accent {
+  color: var(--accent-on-blue);
 }
 
 .cards {
@@ -454,7 +463,7 @@ main {
   height: 8px;
   margin-top: 0.62em;
   border-radius: 50%;
-  background: var(--gold);
+  background: var(--accent);
   box-shadow: 0 0 0 2px var(--blue);
 }
 
@@ -494,7 +503,7 @@ main {
   text-decoration: none;
 }
 
-/* Open Door mark: on the gold header the doorway shows warm white. */
+/* Open Door mark: the doorway is lit terracotta. */
 .wordmark-mark {
   width: 28px;
   height: 29px;
@@ -574,7 +583,7 @@ main {
 }
 
 .footer-links a:hover {
-  color: var(--gold);
+  color: var(--accent-on-blue);
 }
 
 /* ── narrow screens ───────────────────────────────────── */

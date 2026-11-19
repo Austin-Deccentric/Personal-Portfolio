@@ -178,17 +178,17 @@ const hasPhoto = existsSync(join(process.cwd(), 'public', 'photo.jpg'));
     padding-bottom: 96px;
   }
 
-  /* Photo on the right, fading left into the gold behind the headline.
-     Black and white, multiplied onto the gold so it takes the page's colour. */
+  /* Photo on the right, fading left into the warm white behind the headline.
+     Black and white, multiplied onto the page colour so it sits in the page. */
   .hero-photo {
     position: absolute;
     right: 0;
     top: calc(-1 * var(--header-h));
     bottom: var(--road-h);
     width: min(620px, 50%);
-    background: var(--gold);
+    background: var(--bg);
     overflow: hidden;
-    /* Fades in from the left and from under the header, so nav links stay on clean gold. */
+    /* Fades in from the left and from under the header, so nav links stay on clean warm white. */
     -webkit-mask-image:
       linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.85) 48%, #000 70%),
       linear-gradient(to bottom, transparent 0, transparent calc(var(--header-h) - 16px), #000 calc(var(--header-h) + 96px));
@@ -254,7 +254,7 @@ const hasPhoto = existsSync(join(process.cwd(), 'public', 'photo.jpg'));
   }
 
   .stop-dot--lit {
-    background: var(--gold);
+    background: var(--accent);
   }
 
   .stop-body {
@@ -320,7 +320,7 @@ const hasPhoto = existsSync(join(process.cwd(), 'public', 'photo.jpg'));
     gap: 20px;
     padding: 40px;
     border-radius: 24px;
-    background: var(--gold);
+    background: var(--accent-tint);
   }
 
   .kv-head {
@@ -359,7 +359,7 @@ const hasPhoto = existsSync(join(process.cwd(), 'public', 'photo.jpg'));
       padding-bottom: 48px;
     }
 
-    /* The fade ends before the headline starts, so the text sits on plain gold. */
+    /* The fade ends before the headline starts, so the text sits on plain warm white. */
     .hero-photo {
       top: 0;
       bottom: auto;
