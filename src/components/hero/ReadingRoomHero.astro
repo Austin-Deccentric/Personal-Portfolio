@@ -15,7 +15,7 @@ const PORTRAIT_SRC = '/hero/portrait-cutout.webp';
 // Typed in order. `strike` is typed, then crossed out by the cursor.
 const HEADLINE: HeadlineSegment[] = [
   { text: 'Software that goes where ' },
-  { text: 'self', strike: true },
+  { text: 'you', strike: true },
   { text: ' ' },
   { text: 'people', accent: true },
   { text: ' actually go.' },
@@ -35,10 +35,6 @@ const config = JSON.stringify({ portraitSrc: PORTRAIT_SRC, headline: HEADLINE, w
 <section class="rr-hero rr-pending relative overflow-hidden" aria-labelledby="hero-title" data-rr-hero data-config={config}>
   <div class="container grid grid-cols-1 hero:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] hero:min-h-[min(700px,calc(100svh_-_184px))]">
     <div class="relative z-2 flex min-w-0 flex-col justify-center gap-[22px] pt-1 pb-9 hero:gap-[26px] hero:pt-8 hero:pb-12">
-      <p class="m-0 font-courier text-[15px] tracking-[0.03em] text-muted">
-        [ <span class="text-ink">Software for the real world</span> ]
-      </p>
-
       <h1 id="hero-title" class="m-0 text-[clamp(44px,5.8vw,84px)] leading-[0.95] font-extrabold tracking-[-0.045em] text-ink">
         <span class="sr-only">{plainHeadline}</span>
         <span class="relative block" aria-hidden="true" data-typed>
