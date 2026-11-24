@@ -1,0 +1,175 @@
+---
+// Homepage hero: typed headline with a cursor-drawn strikethrough, and a 1-bit
+// dithered portrait whose head breaks away into drifting letters and dashes.
+// Motion lives in ./reading-room.ts; visitors who prefer reduced motion get a still frame.
+import '../../styles/hero.css';
+import type { HeadlineSegment } from './reading-room';
+
+// ─── Swap these ─────────────────────────────────────────────────────────────
+// Portrait: a PNG/WebP with a transparent background dithers cleanly; a photo
+// with a background still works but the background turns into dots too.
+// Make a cutout from a new full-resolution photo with any background remover,
+// save it to public/hero/, and point this at it.
+const PORTRAIT_SRC = '/hero/portrait-cutout.webp';
+
+// Typed in order. `strike` is typed, then crossed out by the cursor.
+const HEADLINE: HeadlineSegment[] = [
+  { text: 'Software that goes where ' },
+  { text: 'self', strike: true },
+  { text: ' ' },
+  { text: 'people', accent: true },
+  { text: ' actually go.' },
+];
+
+// Small words that lift off with the stream.
+const WORDS = ['riders', 'ledger', 'keke', 'voice note', 'Pidgin', 'receipt', 'shops', 'Enugu', 'draft', 'route', 'idempotent', 'approve', 'Igbo', 'async'];
+
+const DITHER_CELL = 3; // dither pixel size in CSS px
+const INK: [number, number, number] = [0x12, 0x35, 0x5b]; // deep blue
+// ────────────────────────────────────────────────────────────────────────────
+
+const plainHeadline = HEADLINE.filter((s) => !s.strike).map((s) => s.text).join('').replace(/\s+/g, ' ');
+const config = JSON.stringify({ portraitSrc: PORTRAIT_SRC, headline: HEADLINE, words: WORDS, cell: DITHER_CELL, ink: INK });
+---
+
+<section class="rr-hero rr-pending relative overflow-hidden" aria-labelledby="hero-title" data-rr-hero data-config={config}>
+  <div class="container grid grid-cols-1 hero:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] hero:min-h-[min(700px,calc(100svh_-_184px))]">
+    <div class="relative z-2 flex min-w-0 flex-col justify-center gap-[22px] pt-1 pb-9 hero:gap-[26px] hero:pt-8 hero:pb-12">
+      <p class="m-0 font-courier text-[15px] tracking-[0.03em] text-muted">
+        [ <span class="text-ink">Software for the real world</span> ]
+      </p>
+
+      <h1 id="hero-title" class="m-0 text-[clamp(44px,5.8vw,84px)] leading-[0.95] font-extrabold tracking-[-0.045em] text-ink">
+        <span class="sr-only">{plainHeadline}</span>
+        <span class="relative block" aria-hidden="true" data-typed>
+          {
+            HEADLINE.map((s) =>
+              s.strike ? (
+                <span class="rr-strike struck">{s.text}<span class="rr-line" /></span>
+              ) : s.accent ? (
+                <span class="rr-accent">{s.text}</span>
+              ) : (
+                s.text
+              ),
+            )
+          }
+        </span>
+      </h1>
+
+      <p class="m-0 max-w-[36ch] text-[clamp(18px,1.5vw,20px)] leading-[1.55] text-text" data-reveal>
+        I'm Augustine (Austin). I build backend and AI systems for the shops, riders and small businesses big tech drives past.
+      </p>
+
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-3" data-reveal>
+        <a href="#work" class="btn btn-primary key">See the route</a>
+        <a href="/contact" class="btn btn-link">Get in touch</a>
+      </div>
+    </div>
+
+    <div class="relative order-first h-[min(56vh,400px)] min-w-0 hero:order-none hero:h-auto" data-stage>
+      <canvas class="absolute inset-0 block h-full w-full" aria-hidden="true" data-canvas></canvas>
+      <span class="sr-only">Portrait of Augustine Chukwu drawn in dots, with letters and dashes drifting up from his head.</span>
+      <span class="rr-sticker sticker absolute right-1 bottom-9 z-2 hero:right-auto hero:bottom-auto hero:left-0 hero:top-[68%]" data-reveal>
+        Co-founder · KekeVest
+      </span>
+    </div>
+  </div>
+
+  <div class="container relative z-2" data-reveal>
+    <p class="m-0 pb-3.5 font-courier text-[13px] tracking-[0.1em] text-muted uppercase">
+      <strong class="font-bold text-ink">Software engineer</strong> · Co-founder, KekeVest
+    </p>
+  </div>
+  <div class="road" aria-hidden="true"></div>
+</section>
+
+<script is:inline>
+  // Runs before first paint. With motion allowed, hide the headline until the
+  // script rebuilds it letter by letter; no-JS and reduced-motion visitors
+  // keep the finished headline from the HTML.
+  (function () {
+    var hero = document.currentScript.previousElementSibling;
+    try {
+      if (hero && !matchMedia('(prefers-reduced-motion: reduce)').matches) hero.classList.add('rr-anim');
+      else if (hero) hero.classList.remove('rr-pending');
+    } catch (e) { hero && hero.classList.remove('rr-pending'); }
+  })();
+</script>
+
+<style is:global>
+  /* Parts the script builds at runtime, plus states Tailwind can't express cleanly. */
+  .rr-hero .rr-w { white-space: nowrap; }
+  .rr-hero .rr-accent {
+    color: var(--accent);
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .rr-pending [data-typed] { visibility: hidden; }
+  .rr-anim .rr-c { visibility: hidden; }
+  .rr-anim .rr-c.on { visibility: visible; }
+
+  .rr-hero .rr-strike { position: relative; display: inline-block; transition: color 0.4s ease, opacity 0.4s ease; }
+  .rr-hero .rr-line {
+    position: absolute;
+    left: -0.04em;
+    top: 55%;
+    width: calc(100% + 0.08em);
+    height: 0.07em;
+    background: var(--blue);
+    transform-origin: left center;
+  }
+  .rr-hero .rr-strike.struck { color: var(--muted); opacity: 0.7; }
+  .rr-anim .rr-strike:not(.struck) .rr-line { transform: scaleX(var(--p, 0)); }
+
+  .rr-hero .rr-cursor {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0.5em;
+    height: 0.74em;
+    background: var(--blue);
+    pointer-events: none;
+  }
+  .rr-hero .rr-cursor.blink { animation: rr-blink 1.06s steps(1, end) infinite; }
+  @keyframes rr-blink { 50% { opacity: 0; } }
+
+  /* Copy, buttons and sticker fade up once the headline is typed. */
+  .rr-anim [data-reveal] {
+    opacity: 0;
+    translate: 0 10px;
+    transition: opacity 0.6s ease, translate 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .rr-anim [data-reveal].on { opacity: 1; translate: none; }
+
+  @media (max-width: 899.98px) {
+    .rr-hero .rr-sticker { font-size: 12px; padding: 8px 12px; }
+  }
+
+</style>
+
+<script>
+  import { mountReadingRoomHero, type HeroConfig } from './reading-room';
+
+  let cleanup: (() => void) | undefined;
+
+  function mount() {
+    cleanup?.();
+    const root = document.querySelector<HTMLElement>('[data-rr-hero]');
+    if (!root) return;
+    const cfg = JSON.parse(root.dataset.config!) as HeroConfig;
+    cleanup = mountReadingRoomHero(root, cfg);
+  }
+
+  function unmount() {
+    cleanup?.();
+    cleanup = undefined;
+  }
+
+  mount();
+  // Works with or without Astro's client router.
+  document.addEventListener('astro:after-swap', mount);
+  document.addEventListener('astro:before-swap', unmount);
+  window.addEventListener('pagehide', unmount);
+</script>

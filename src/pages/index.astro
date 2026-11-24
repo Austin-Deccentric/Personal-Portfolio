@@ -1,8 +1,6 @@
 ---
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 import Base from '../layouts/Base.astro';
-import Masthead from '../components/Masthead.astro';
+import ReadingRoomHero from '../components/hero/ReadingRoomHero.astro';
 import Section from '../components/Section.astro';
 import { getCollection } from 'astro:content';
 import { statusInfo } from '../data/status';
@@ -30,33 +28,10 @@ const stops = [
   },
   ...projectStops.slice(1),
 ].map((stop, i) => ({ ...stop, no: String(i + 1).padStart(2, '0') }));
-
-// The hero photo shows once public/photo.jpg exists; without it the hero is text only.
-const hasPhoto = existsSync(join(process.cwd(), 'public', 'photo.jpg'));
 ---
 
 <Base title="Augustine (Austin) Chukwu — Software engineer">
-  <Masthead slot="masthead" class:list={['hero', { 'hero--photo': hasPhoto }]}>
-    {
-      hasPhoto && (
-        <Fragment slot="art">
-          <div class="hero-photo">
-            <img src="/photo.jpg" width="900" height="1125" alt="Augustine Chukwu" fetchpriority="high" />
-          </div>
-          <span class="sticker hero-sticker">Co-founder · KekeVest</span>
-        </Fragment>
-      )
-    }
-    <h1>Software that goes where <span class="accent">people</span> actually go.</h1>
-    <p class="lede">
-      I'm Augustine (Austin). I build backend and AI systems for the shops, riders and small
-      businesses big tech drives past.
-    </p>
-    <div class="actions">
-      <a href="#work" class="btn btn-primary">See the route</a>
-      <a href="/contact" class="btn btn-link">Get in touch</a>
-    </div>
-  </Masthead>
+  <ReadingRoomHero slot="masthead" />
 
   <Section id="work" class="container">
     <div class="section-head">
@@ -169,52 +144,6 @@ const hasPhoto = existsSync(join(process.cwd(), 'public', 'photo.jpg'));
 </Base>
 
 <style>
-  /* The masthead root and its slots render inside the Masthead component. */
-  :global(.hero h1) {
-    max-width: 860px;
-  }
-
-  :global(.hero--photo .masthead-inner) {
-    padding-bottom: 96px;
-  }
-
-  /* Photo on the right, fading left into the warm white behind the headline.
-     Black and white, multiplied onto the page colour so it sits in the page. */
-  .hero-photo {
-    position: absolute;
-    right: 0;
-    top: calc(-1 * var(--header-h));
-    bottom: var(--road-h);
-    width: min(620px, 50%);
-    background: var(--bg);
-    overflow: hidden;
-    /* Fades in from the left and from under the header, so nav links stay on clean warm white. */
-    -webkit-mask-image:
-      linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.85) 48%, #000 70%),
-      linear-gradient(to bottom, transparent 0, transparent calc(var(--header-h) - 16px), #000 calc(var(--header-h) + 96px));
-    -webkit-mask-composite: source-in;
-    mask-image:
-      linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.85) 48%, #000 70%),
-      linear-gradient(to bottom, transparent 0, transparent calc(var(--header-h) - 16px), #000 calc(var(--header-h) + 96px));
-    mask-composite: intersect;
-  }
-
-  .hero-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 18%;
-    filter: grayscale(1) contrast(1.15) brightness(1.05);
-    mix-blend-mode: multiply;
-  }
-
-  .hero-sticker {
-    position: absolute;
-    z-index: 1;
-    right: 96px;
-    top: 24px;
-  }
-
   .route {
     display: flex;
     flex-direction: column;
@@ -353,29 +282,6 @@ const hasPhoto = existsSync(join(process.cwd(), 'public', 'photo.jpg'));
   }
 
   @media (max-width: 767.98px) {
-    /* On phones the photo sits on top and fades down into the headline. */
-    :global(.hero--photo .masthead-inner) {
-      padding-top: 290px;
-      padding-bottom: 48px;
-    }
-
-    /* The fade ends before the headline starts, so the text sits on plain warm white. */
-    .hero-photo {
-      top: 0;
-      bottom: auto;
-      width: 100%;
-      height: 380px;
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 64px, #000 30%, transparent 76%);
-      mask-image: linear-gradient(to bottom, transparent 0, #000 64px, #000 30%, transparent 76%);
-    }
-
-    .hero-sticker {
-      right: 16px;
-      top: 16px;
-      font-size: 12px;
-      padding: 8px 12px;
-    }
-
     .stop {
       gap: 16px;
     }
