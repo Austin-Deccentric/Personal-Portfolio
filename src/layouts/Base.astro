@@ -71,14 +71,7 @@ const nav = [
           <span class="wordmark-text">Augustine Chukwu</span>
         </a>
         <nav class="nav" aria-label="Primary" data-nav>
-          <!-- Phones: Work / About / Stack fold into this menu; "Say hello" stays visible on the far right. -->
-          <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" data-nav-toggle>
-            <span class="sr-only">Menu</span>
-            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
-              <path class="nav-toggle-bars" d="M3 6h18M3 12h18M3 18h18" />
-              <path class="nav-toggle-x" d="M5 5l14 14M19 5L5 19" />
-            </svg>
-          </button>
+          <!-- Phones: Work / About / Stack fold into this menu; the button sits on the far right, after "Say hello". -->
           <div class="nav-links" id="nav-menu" data-nav-menu>
             {
               nav.map((item) => (
@@ -89,6 +82,13 @@ const nav = [
             }
           </div>
           <a class="nav-cta key" href="/contact" aria-current={path === '/contact' ? 'page' : undefined}>Say hello</a>
+          <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" data-nav-toggle>
+            <span class="sr-only">Menu</span>
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+              <path class="nav-toggle-bars" d="M3 6h18M3 12h18M3 18h18" />
+              <path class="nav-toggle-x" d="M5 5l14 14M19 5L5 19" />
+            </svg>
+          </button>
         </nav>
       </header>
       <div id="main" tabindex="-1">
@@ -123,7 +123,12 @@ const nav = [
           toggle.setAttribute('aria-expanded', String(open));
           nav.classList.toggle('is-open', open);
         };
-        toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+        toggle.addEventListener('click', (e) => {
+          const open = toggle.getAttribute('aria-expanded') !== 'true';
+          setOpen(open);
+          // The links come before the button in the page, so move keyboard focus into the menu.
+          if (open && (e as MouseEvent).detail === 0) menu.querySelector('a')?.focus();
+        });
         menu.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('a')) setOpen(false); });
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape' && nav.classList.contains('is-open')) { setOpen(false); toggle.focus(); }

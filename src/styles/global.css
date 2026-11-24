@@ -652,7 +652,7 @@ main {
 
 /* ── phone menu ──────────────────────────────────────────
    Wide screens: the toggle is hidden and the links sit inline.
-   Phones: Work / About / Stack fold into a dropdown; "Say hello" stays on the far right. */
+   Phones: Work / About / Stack fold into a dropdown behind the far-right menu button. */
 .nav-links {
   display: contents;
 }
