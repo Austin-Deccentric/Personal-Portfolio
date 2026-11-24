@@ -237,7 +237,7 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
     // On tall screens height decides; on wide screens width does (the waist is cropped more).
     const HEAD_TOP = 0.155; // crown position in the source photo, as a share of its height
     const fitH = (gh * (narrow ? 0.86 : 0.92)) / img.naturalHeight;
-    const fitW = (gw * (narrow ? 0.95 : 0.88)) / img.naturalWidth;
+    const fitW = (gw * (narrow ? 0.8 : 0.88)) / img.naturalWidth;
     // ...but never so large that the head stops fitting (very wide, short screens).
     const scale = Math.min(Math.max(fitH, fitW), (gh * 1.15) / img.naturalHeight);
     const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;

@@ -33,17 +33,19 @@ const config = JSON.stringify({ portraitSrc: PORTRAIT_SRC, headline: HEADLINE, w
 ---
 
 <section class="rr-hero rr-pending relative overflow-hidden" aria-labelledby="hero-title" data-rr-hero data-config={config}>
-  <!-- Portrait: full-bleed on the right on desktop, a band above the copy on phones. -->
-  <div class="relative h-[min(62vh,460px)] hero:absolute hero:inset-y-0 hero:right-0 hero:left-[40%] hero:h-auto" data-stage>
+  <!-- Portrait: full-bleed on the right on desktop. On phones it sits behind the top of the
+       hero and fades out before the headline (the site's original phone pattern), so the
+       headline, subcopy and buttons stay in the first screen. -->
+  <div class="rr-stage absolute inset-x-0 top-0 h-[400px] hero:inset-y-0 hero:right-0 hero:left-[40%] hero:h-auto" data-stage>
     <canvas class="pointer-events-none absolute inset-0 block h-full w-full" aria-hidden="true" data-canvas></canvas>
     <span class="sr-only">Portrait of Augustine Chukwu drawn in fine dots. The top of his head breaks away into dashes and letters that drift up and to the right.</span>
-    <span class="rr-sticker sticker absolute right-4 bottom-6 z-2 hero:right-auto hero:bottom-auto hero:left-[6%] hero:top-[74%]" data-reveal>
+    <span class="rr-sticker sticker absolute right-2 top-[60%] z-2 hero:right-auto hero:bottom-auto hero:left-[6%] hero:top-[74%]" data-reveal>
       Co-founder · KekeVest
     </span>
   </div>
 
   <div class="container relative z-2 hero:flex hero:min-h-[min(760px,calc(100svh_-_136px))] hero:items-center">
-    <div class="flex max-w-[600px] min-w-0 flex-col gap-[22px] pt-2 pb-9 hero:gap-7 hero:py-14">
+    <div class="flex max-w-[600px] min-w-0 flex-col gap-[22px] pt-[292px] pb-9 hero:gap-7 hero:py-14">
       <h1 id="hero-title" class="m-0 text-[clamp(44px,5.6vw,84px)] leading-[0.95] font-extrabold tracking-[-0.045em] text-ink">
         <span class="sr-only">{plainHeadline}</span>
         <span class="relative block" aria-hidden="true" data-typed>
@@ -142,6 +144,10 @@ const config = JSON.stringify({ portraitSrc: PORTRAIT_SRC, headline: HEADLINE, w
   .rr-anim [data-reveal].on { opacity: 1; translate: none; }
 
   @media (max-width: 899.98px) {
+    .rr-hero .rr-stage {
+      -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 55%, transparent 80%);
+      mask-image: linear-gradient(to bottom, #000 0, #000 55%, transparent 80%);
+    }
     .rr-hero .rr-sticker { font-size: 12px; padding: 8px 12px; }
   }
 
