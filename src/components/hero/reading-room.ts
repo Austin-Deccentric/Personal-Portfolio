@@ -232,11 +232,17 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
     gw = Math.ceil(W / cell); gh = Math.ceil(H / cell);
     narrow = window.innerWidth < 900;
 
-    // Fill the stage top to bottom and bleed off the floor, head leaving room for the stream.
-    const scale = (gh * (narrow ? 0.86 : 0.9)) / img.naturalHeight;
+    // Fill the right side like the reference: the figure is as wide as most of the stage,
+    // the head sits about a fifth of the way down, and the body runs off the bottom.
+    // On tall screens height decides; on wide screens width does (the waist is cropped more).
+    const HEAD_TOP = 0.155; // crown position in the source photo, as a share of its height
+    const fitH = (gh * (narrow ? 0.86 : 0.92)) / img.naturalHeight;
+    const fitW = (gw * (narrow ? 0.95 : 0.88)) / img.naturalWidth;
+    // ...but never so large that the head stops fitting (very wide, short screens).
+    const scale = Math.min(Math.max(fitH, fitW), (gh * 1.15) / img.naturalHeight);
     const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
-    const dx = gw * (narrow ? 0.5 : 0.5) - dw / 2;
-    const dy = gh - dh * 0.97; // a sliver of the waist runs off the bottom
+    const dx = gw * (narrow ? 0.5 : 0.56) - dw / 2;
+    const dy = Math.min(gh - dh * 0.97, gh * (narrow ? 0.2 : 0.17) - dh * HEAD_TOP);
 
     const tmp = document.createElement('canvas');
     tmp.width = gw; tmp.height = gh;
