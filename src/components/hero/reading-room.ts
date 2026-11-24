@@ -1,7 +1,11 @@
-// Reading-room hero: key-by-key headline with a cursor-drawn strikethrough,
-// and a 1-bit dithered portrait whose head breaks away into drifting text.
-// mountReadingRoomHero() returns a cleanup function that stops every timer,
-// animation frame and observer it started.
+// Reading-room hero, choreographed like a typed page coming apart:
+//   1. the portrait fades in as fine stipple while the headline types key by key;
+//   2. the cursor backs onto the struck word and draws the line through it, and at
+//      that moment the head starts to break away from the crown;
+//   3. the break grows into a large stream of dashes and letters blowing up and
+//      to the right, then keeps shedding in a loop;
+//   4. the subcopy types out, then the buttons and the footer line appear.
+// mountReadingRoomHero() returns a cleanup that stops every timer, frame and observer.
 
 export interface HeadlineSegment {
   text: string;
@@ -14,40 +18,34 @@ export interface HeadlineSegment {
 export interface HeroConfig {
   portraitSrc: string;
   headline: HeadlineSegment[];
-  /** Ink colour for the dither and drifting text, as [r, g, b]. */
+  /** Ink colour for the stipple and the stream, as [r, g, b]. */
   ink: [number, number, number];
-  /** Dither pixel size in CSS px. */
+  /** Stipple dot size in CSS px. */
   cell: number;
   words: string[];
 }
 
 const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
 const FONT_STACK = '"Courier Prime", "Courier New", monospace';
-const BAYER = [
-  0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30,
-  54, 22, 3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23,
-  61, 29, 53, 21,
-].map((v) => (v + 0.5) / 64);
+const BREAK_GROW_S = 3.2; // how long the break takes to reach full size
+const BREAK_DEPTH = 0.4; // how much of the head band ends up broken away (0–1)
 
 const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
   return t * t * (3 - 2 * t);
 };
-const hash = (i: number, s: number) => {
-  let h = (i * 374761393 + s * 668265263) | 0;
-  h = Math.imul(h ^ (h >>> 13), 1274126177);
-  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-};
+const easeOut = (x: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 3);
 
-type Kind = 'dash' | 'char' | 'word';
+type Kind = 'dash' | 'dot' | 'char' | 'word';
 interface Particle {
   x: number; y: number; vx: number; vy: number;
   age: number; life: number; ph: number; kind: Kind;
-  len?: number; s?: string; size?: number;
+  len: number; s: string; size: number;
 }
 
 export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => void {
   const typedEl = root.querySelector<HTMLElement>('[data-typed]')!;
+  const ledeEl = root.querySelector<HTMLElement>('[data-type-lede]');
   const reveals = [...root.querySelectorAll<HTMLElement>('[data-reveal]')];
   const stage = root.querySelector<HTMLElement>('[data-stage]')!;
   const canvas = root.querySelector<HTMLCanvasElement>('[data-canvas]')!;
@@ -59,7 +57,7 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
   let reduced = mq.matches;
   root.classList.toggle('rr-anim', !reduced);
 
-  // ---------- timers ----------
+  // ───────────── timers ─────────────
   const timers = new Set<number>();
   const later = (fn: () => void, ms: number) => {
     const id = window.setTimeout(() => { timers.delete(id); fn(); }, ms);
@@ -68,12 +66,20 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
   const clearTimers = () => { timers.forEach(clearTimeout); timers.clear(); };
   let sweepRaf = 0;
 
-  // ---------- headline ----------
+  // ───────────── text ─────────────
   let chars: { el: HTMLElement | null; seg: HeadlineSegment }[] = [];
   let strikeEl: HTMLElement | null = null;
   let strikeChars: HTMLElement[] = [];
+  let ledeChars: HTMLElement[] = [];
   const cursor = document.createElement('span');
   cursor.className = 'rr-cursor';
+
+  const charSpan = (ch: string) => {
+    const c = document.createElement('span');
+    c.className = 'rr-c';
+    c.textContent = ch;
+    return c;
+  };
 
   function buildHeadline() {
     typedEl.textContent = '';
@@ -92,9 +98,7 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
         const word = document.createElement('span');
         word.className = 'rr-w';
         for (const ch of part) {
-          const c = document.createElement('span');
-          c.className = 'rr-c';
-          c.textContent = ch;
+          const c = charSpan(ch);
           word.appendChild(c);
           chars.push({ el: c, seg });
           if (seg.strike) strikeChars.push(c);
@@ -110,6 +114,22 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
     typedEl.appendChild(cursor);
   }
 
+  // The subcopy types out too; words stay unbroken so lines never reflow while typing.
+  function buildLede() {
+    if (!ledeEl) return;
+    const text = ledeEl.textContent!.replace(/\s+/g, ' ').trim();
+    ledeEl.textContent = '';
+    ledeChars = [];
+    text.split(/( )/).forEach((part) => {
+      if (!part) return;
+      if (part === ' ') { ledeEl.appendChild(document.createTextNode(' ')); return; }
+      const w = document.createElement('span');
+      w.className = 'rr-w';
+      for (const ch of part) { const c = charSpan(ch); w.appendChild(c); ledeChars.push(c); }
+      ledeEl.appendChild(w);
+    });
+  }
+
   const visibleChars = () => chars.filter((c) => c.el).map((c) => c.el!);
   function cursorAt(x: number, el: HTMLElement) {
     const b = typedEl.getBoundingClientRect();
@@ -117,83 +137,90 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
     cursor.style.transform = `translate(${x - b.left}px, ${r.top - b.top + r.height * 0.17}px)`;
   }
   const after = (el: HTMLElement) => cursorAt(el.getBoundingClientRect().right + 3, el);
-  const before = (el: HTMLElement) => cursorAt(el.getBoundingClientRect().left, el);
 
-  function settleHeadline() {
+  function settleText() {
     visibleChars().forEach((el) => el.classList.add('on'));
+    ledeChars.forEach((el) => el.classList.add('on'));
     strikeEl?.classList.add('struck');
     after(visibleChars().at(-1)!);
     cursor.classList.toggle('blink', !reduced);
     reveals.forEach((el) => el.classList.add('on'));
   }
 
-  function playHeadline() {
+  function playText() {
     clearTimers();
+    breakT = -1;
     cancelAnimationFrame(sweepRaf);
     reveals.forEach((el) => el.classList.remove('on'));
     strikeEl?.classList.remove('struck');
     strikeEl?.style.setProperty('--p', '0');
     visibleChars().forEach((el) => el.classList.remove('on'));
-    before(visibleChars()[0]);
+    ledeChars.forEach((el) => el.classList.remove('on'));
+    cursorAt(visibleChars()[0].getBoundingClientRect().left, visibleChars()[0]);
     cursor.classList.add('blink');
     let i = 0;
 
     const step = () => {
       cursor.classList.remove('blink');
       while (i < chars.length && !chars[i].el) i++;
-      if (i >= chars.length) return finish();
+      if (i >= chars.length) return typeLede();
       const c = chars[i++];
       c.el!.classList.add('on');
       after(c.el!);
       const endOfStrike = c.seg.strike && (i >= chars.length || chars[i].seg !== c.seg);
-      if (endOfStrike) return later(crossOut, 380);
+      if (endOfStrike) return later(crossOut, 360);
       const next = chars[i];
-      later(step, 44 + Math.random() * 48 + (next && !next.el ? 40 : 0));
+      later(step, 52 + Math.random() * 50 + (next && !next.el ? 50 : 0));
     };
 
-    // The cursor backs up over the word, then sweeps right and leaves the line behind it.
+    // The cursor jumps back onto the word, then sweeps right drawing the line.
+    // The head starts breaking away as the line is drawn.
     const crossOut = () => {
-      let k = strikeChars.length - 1;
-      const back = () => {
-        before(strikeChars[k]);
-        if (--k >= 0) later(back, 70);
-        else later(sweep, 240);
-      };
-      const sweep = () => {
-        const first = strikeChars[0];
+      const first = strikeChars[0];
+      cursorAt(first.getBoundingClientRect().left, first);
+      later(() => {
         const r0 = first.getBoundingClientRect();
         const r1 = strikeChars[strikeChars.length - 1].getBoundingClientRect();
         const t0 = performance.now();
+        startBreak();
         const run = (now: number) => {
-          const p = Math.min(1, (now - t0) / 380);
-          const e = 1 - Math.pow(1 - p, 3);
+          const p = Math.min(1, (now - t0) / 420);
+          const e = 1 - Math.pow(1 - p, 2);
           strikeEl!.style.setProperty('--p', e.toFixed(3));
           cursorAt(r0.left + (r1.right + 3 - r0.left) * e, first);
           if (p < 1) sweepRaf = requestAnimationFrame(run);
-          else { strikeEl!.classList.add('struck'); later(step, 300); }
+          else { strikeEl!.classList.add('struck'); later(step, 380); }
         };
         sweepRaf = requestAnimationFrame(run);
-      };
-      back();
+      }, 260);
     };
 
-    const finish = () => {
+    const typeLede = () => {
       cursor.classList.add('blink');
-      reveals.forEach((el, k) => later(() => el.classList.add('on'), 120 + k * 140));
+      let k = 0;
+      const tick = () => {
+        // a few characters per tick: fast, like the video's body copy
+        for (let n = 0; n < 3 && k < ledeChars.length; n++) ledeChars[k++].classList.add('on');
+        if (k < ledeChars.length) later(tick, 16);
+        else reveals.forEach((el, j) => later(() => el.classList.add('on'), 140 + j * 160));
+      };
+      later(tick, 320);
     };
-    later(step, 700);
+    later(step, 650);
   }
 
-  // ---------- portrait ----------
+  // ───────────── portrait ─────────────
   const img = new Image();
-  let gw = 0, gh = 0, cell = 3, dpr = 1, W = 0, H = 0, narrow = false;
-  let tone = new Float32Array(0), bayerAt = new Float32Array(0), holes = new Float32Array(0), erodeW = new Float32Array(0);
+  let gw = 0, gh = 0, cell = 2, dpr = 1, W = 0, H = 0, narrow = false;
+  let tone = new Float32Array(0), thresh = new Float32Array(0);
+  let erodeKey = new Float32Array(0); // < 0: never breaks; else lower breaks first
+  let headCells = new Int32Array(0); // head cells sorted by erodeKey
   let small: HTMLCanvasElement | null = null, sctx: CanvasRenderingContext2D | null = null;
   let simg: ImageData | null = null, buf32 = new Uint32Array(0);
-  let emitters: number[] = [], headCx = 0;
   let particles: Particle[] = [];
-  let raf = 0, running = false, visible = true, startT = 0, lastT = 0, spawnAcc = 0, wordAcc = 0;
+  let raf = 0, running = false, visible = true, startT = 0, lastT = 0, breakT = -1, emitAcc = 0, wordAcc = 0;
   let ready = false;
+  let rng = Math.random;
 
   function layout() {
     const r = stage.getBoundingClientRect();
@@ -201,15 +228,15 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     W = Math.round(r.width * dpr); H = Math.round(r.height * dpr);
     canvas.width = W; canvas.height = H;
-    cell = Math.max(2, Math.round(cfg.cell * dpr));
+    cell = Math.max(1, Math.round(cfg.cell * dpr));
     gw = Math.ceil(W / cell); gh = Math.ceil(H / cell);
     narrow = window.innerWidth < 900;
 
-    // Portrait sits on the floor, with headroom above for the stream.
-    let scale = (gh * (narrow ? 0.92 : 0.84)) / img.naturalHeight;
-    if (img.naturalWidth * scale > gw * 1.1) scale = (gw * 1.1) / img.naturalWidth;
+    // Fill the stage top to bottom and bleed off the floor, head leaving room for the stream.
+    const scale = (gh * (narrow ? 0.86 : 0.9)) / img.naturalHeight;
     const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
-    const dx = (gw - dw) * (narrow ? 0.5 : 0.42), dy = gh - dh;
+    const dx = gw * (narrow ? 0.5 : 0.5) - dw / 2;
+    const dy = gh - dh * 0.97; // a sliver of the waist runs off the bottom
 
     const tmp = document.createElement('canvas');
     tmp.width = gw; tmp.height = gh;
@@ -225,31 +252,46 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
       alpha[i] = a;
       dark[i] = (1 - l) * a; // ink = darkness, like print
     }
-    const blurred = boxBlur(dark, gw, gh, 3);
-    tone = new Float32Array(n); bayerAt = new Float32Array(n); erodeW = new Float32Array(n);
+    const rad = Math.max(2, Math.round(3 * (gw / 500)));
+    const blurred = boxBlur(dark, gw, gh, rad);
+    tone = new Float32Array(n); thresh = new Float32Array(n); erodeKey = new Float32Array(n).fill(-1);
+
+    // Head box from the silhouette: top row, and its width across the upper band.
     let headTop = gh;
     for (let i = 0; i < n; i++) if (alpha[i] > 0.5) { headTop = (i / gw) | 0; break; }
-    const band = gh * 0.2;
-    let sx = 0, sc = 0;
-    emitters = [];
+    const headH = dh * 0.36; // crown to chin in this crop
+    let minX = gw, maxX = 0;
+    for (let y = headTop; y < Math.min(gh, headTop + headH * 0.6); y++) for (let x = 0; x < gw; x++) {
+      if (alpha[y * gw + x] > 0.5) { if (x < minX) minX = x; if (x > maxX) maxX = x; }
+    }
+    const headW = Math.max(1, maxX - minX);
+
+    // smooth random field so the break edge is ragged, not a straight line
+    const noise = new Float32Array(n);
+    for (let i = 0; i < n; i++) noise[i] = Math.random();
+    const nb = boxBlur(boxBlur(noise, gw, gh, Math.max(2, rad * 2)), gw, gh, Math.max(2, rad * 2));
+
+    const head: number[] = [];
     for (let y = 0; y < gh; y++) for (let x = 0; x < gw; x++) {
       const i = y * gw + x;
-      bayerAt[i] = BAYER[(y & 7) * 8 + (x & 7)];
-      let v = Math.pow(dark[i], 1.15) * 1.05 + 1.5 * (dark[i] - blurred[i]); // tone + local detail
-      v *= smooth(0.05, 0.3, alpha[i]);
-      const xn = x / gw, yn = y / gh;
-      let f = smooth(1.0, narrow ? 0.7 : 0.8, yn); // soft fade into the floor
-      if (!narrow) f *= smooth(0.0, 0.14, xn);
-      tone[i] = Math.max(0, Math.min(1, v * f));
-      // Crown band: where the head breaks away, heavier toward the top and the right.
-      const d = (y - headTop) / band;
-      if (alpha[i] > 0.4 && d >= 0 && d < 1) {
-        erodeW[i] = (1 - d) * (narrow ? 0.8 : 0.55 + 0.45 * xn);
-        if (tone[i] > 0.15) { emitters.push(i); sx += x; sc++; }
+      thresh[i] = Math.random(); // stipple: random threshold per dot
+      let v = Math.pow(dark[i], 1.1) * 1.08 + 1.7 * (dark[i] - blurred[i]);
+      v *= smooth(0.04, 0.35, alpha[i]);
+      if (!narrow) v *= smooth(0.0, 0.08, x / gw);
+      tone[i] = Math.max(0, Math.min(1, v));
+
+      // break order: crown and back of the head first, the face last
+      const dy = (y - headTop) / headH;
+      if (alpha[i] > 0.3 && dy >= -0.02 && dy < 0.75) {
+        const dx = (x - minX) / headW; // 0 left .. 1 right
+        const lean = narrow ? 0.5 : 1 - dx; // right side (back of the stream) goes first
+        erodeKey[i] = dy * 0.9 + lean * 0.55 + (nb[i] - 0.5) * 2.2 * 0.2;
+        if (tone[i] > 0.05) head.push(i);
       }
     }
-    headCx = sc ? sx / sc : gw / 2;
-    holes = new Float32Array(n);
+    head.sort((a, b) => erodeKey[a] - erodeKey[b]);
+    headCells = Int32Array.from(head);
+
     small = document.createElement('canvas');
     small.width = gw; small.height = gh;
     sctx = small.getContext('2d')!;
@@ -279,11 +321,26 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
     return out;
   }
 
-  function paintDither(now: number, gain: number, erosion: number) {
-    const n = gw * gh, seed = Math.floor(now / 90);
+  // Break front: key value below which the head is gone. Grows, then breathes so it keeps shedding.
+  const keyRange = () => (headCells.length ? [erodeKey[headCells[0]], erodeKey[headCells[headCells.length - 1]]] : [0, 1]);
+  function frontAt(sinceBreak: number) {
+    if (sinceBreak < 0) return -Infinity;
+    const [k0, k1] = keyRange();
+    const grow = easeOut(sinceBreak / BREAK_GROW_S);
+    const breathe = sinceBreak > BREAK_GROW_S ? Math.sin((sinceBreak - BREAK_GROW_S) * 0.9) * 0.025 : 0;
+    return k0 + (k1 - k0) * (BREAK_DEPTH * grow + breathe * grow);
+  }
+
+  function paint(gain: number, front: number, jitterSeed: number) {
+    const n = gw * gh;
+    const edge = 0.05 * (keyRange()[1] - keyRange()[0]);
     for (let i = 0; i < n; i++) {
-      let on = tone[i] * gain > bayerAt[i] && holes[i] < now;
-      if (on && erosion > 0 && erodeW[i] > 0 && hash(i, seed) < erodeW[i] * erosion) on = false;
+      let on = tone[i] * gain > thresh[i];
+      if (on && erodeKey[i] >= 0) {
+        const d = erodeKey[i] - front;
+        if (d < 0) on = false;
+        else if (d < edge) on = ((i * 2654435761 + jitterSeed) >>> 0) % 1000 > 1000 * (1 - d / edge) * 0.8; // crumbling edge
+      }
       buf32[i] = on ? INK : 0;
     }
     sctx!.putImageData(simg!, 0, 0);
@@ -292,80 +349,109 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
     ctx.drawImage(small!, 0, 0, gw * cell, gh * cell);
   }
 
-  function spawn(now: number, kind: Kind, rnd: () => number = Math.random) {
-    if (!emitters.length) return;
-    const idx = emitters[Math.floor(Math.pow(rnd(), 1.6) * emitters.length)];
+  // Emit from cells sitting on the break front.
+  function emit(front: number, kind: Kind) {
+    if (!headCells.length) return;
+    const [k0, k1] = keyRange();
+    const band = (k1 - k0) * 0.08;
+    let lo = lowerBound(front - band), hi = lowerBound(front + band * 0.3);
+    if (hi <= lo) { lo = 0; hi = Math.max(1, lowerBound(front)); }
+    const idx = headCells[lo + Math.floor(rng() * (hi - lo))];
+    if (idx === undefined) return;
     const gx = idx % gw, gy = (idx / gw) | 0;
-    holes[idx] = now + 300 + rnd() * 1200;
-    const spread = (gx - headCx) / Math.max(1, gw * 0.3);
-    const wind = narrow ? 0 : 34; // the stream leans up and to the right
     const d = dpr;
-    const p: Particle = { x: gx * cell, y: gy * cell, vx: 0, vy: 0, age: 0, life: 1, ph: rnd() * 6.28, kind };
-    if (kind === 'dash') {
-      p.vx = (wind + spread * 30 + (rnd() - 0.5) * 30) * d;
-      p.vy = -(30 + rnd() * 60) * d;
-      p.life = 1.6 + rnd() * 2.6;
-      p.len = (4 + rnd() * 9) * d;
-    } else if (kind === 'char') {
-      p.vx = (wind * 0.8 + spread * 24 + (rnd() - 0.5) * 26) * d;
-      p.vy = -(22 + rnd() * 40) * d;
-      p.life = 2.4 + rnd() * 3;
-      p.s = LETTERS[Math.floor(rnd() * LETTERS.length)];
-      p.size = (11 + rnd() * 6) * d;
-    } else {
-      p.vx = (wind * 0.5 + spread * 14 + (rnd() - 0.5) * 10) * d;
-      p.vy = -(14 + rnd() * 12) * d;
-      p.life = 5 + rnd() * 2.5;
-      p.s = cfg.words[Math.floor(rnd() * cfg.words.length)];
-      p.size = (12 + rnd() * 2) * d;
-    }
+    // wind: up and to the right on desktop, mostly up on phones
+    const ang = (narrow ? -1.35 : -0.72) + (rng() - 0.5) * 0.7;
+    const speed = (kind === 'word' ? 26 : 18 + rng() * 80) * d;
+    const p: Particle = {
+      x: gx * cell, y: gy * cell,
+      vx: Math.cos(ang) * speed, vy: Math.sin(ang) * speed,
+      age: 0, ph: rng() * 6.283, kind,
+      life: kind === 'word' ? 4.5 + rng() * 2 : 2.2 + rng() * 3.2,
+      len: (3 + rng() * 9) * d, s: '', size: 0,
+    };
+    if (kind === 'char') { p.s = LETTERS[Math.floor(rng() * LETTERS.length)]; p.size = (9 + rng() * 6) * d; }
+    if (kind === 'word') { p.s = cfg.words[Math.floor(rng() * cfg.words.length)]; p.size = (11 + rng() * 2) * d; }
     particles.push(p);
   }
+  function lowerBound(v: number) {
+    let a = 0, b = headCells.length;
+    while (a < b) { const m = (a + b) >> 1; if (erodeKey[headCells[m]] < v) a = m + 1; else b = m; }
+    return a;
+  }
 
-  function drawParticles(dt: number) {
-    const maxP = narrow ? 170 : 340;
-    if (particles.length > maxP) particles.splice(0, particles.length - maxP);
-    ctx.fillStyle = inkCss;
-    ctx.strokeStyle = inkCss;
-    ctx.textBaseline = 'middle';
-    ctx.lineWidth = Math.max(1, Math.round(1.4 * dpr));
-    ctx.lineCap = 'butt';
-    const buckets: Particle[][] = [[], [], [], []]; // dashes, batched by opacity
-    let font = '';
+  function step(dt: number, time: number) {
+    const max = narrow ? 1200 : 3000;
+    if (particles.length > max) particles.splice(0, particles.length - max);
+    const d = dpr;
     for (let k = particles.length - 1; k >= 0; k--) {
       const p = particles[k];
       p.age += dt;
-      if (p.age > p.life || p.y < -30 || p.x > W + 60) { particles.splice(k, 1); continue; }
-      p.vy -= 6 * dpr * dt;
-      p.x += (p.vx + Math.sin(p.age * 2.2 + p.ph) * 9 * dpr) * dt;
+      if (p.age > p.life || p.y < -40 || p.x > W + 80 || p.x < -80) { particles.splice(k, 1); continue; }
+      // turbulence: a slowly turning flow so the stream curls instead of falling in straight lines
+      const swirl = Math.sin(p.y * 0.006 / d + time * 0.8 + p.ph) * 0.6 + Math.sin(p.x * 0.005 / d - time * 0.6) * 0.4;
+      const acc = (p.kind === 'word' ? 6 : 28) * d;
+      p.vx += (Math.cos(swirl - 0.9) * acc * 0.6) * dt;
+      p.vy += (Math.sin(swirl - 1.6) * acc) * dt;
+      p.x += p.vx * dt;
       p.y += p.vy * dt;
+    }
+  }
+
+  function drawParticles() {
+    ctx.fillStyle = inkCss;
+    ctx.strokeStyle = inkCss;
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = Math.max(1, Math.round(1.2 * dpr));
+    ctx.lineCap = 'butt';
+    const dashes: Particle[][] = [[], [], [], []];
+    const dots: Particle[][] = [[], [], [], []];
+    let font = '';
+    for (const p of particles) {
       const t = p.age / p.life;
-      const a = Math.min(1, p.age / 0.2) * (1 - t * t) * smooth(0, H * 0.1, p.y);
+      const a = Math.min(1, p.age / 0.15) * (1 - t * t) * smooth(0, H * 0.08, p.y);
       if (a <= 0.03) continue;
-      if (p.kind === 'dash') { buckets[Math.min(3, (a * 4) | 0)].push(p); continue; }
+      const b = Math.min(3, (a * 4) | 0);
+      if (p.kind === 'dash') { dashes[b].push(p); continue; }
+      if (p.kind === 'dot') { dots[b].push(p); continue; }
       const f = p.kind === 'word'
-        ? `italic 400 ${Math.round(p.size!)}px ${FONT_STACK}`
-        : `700 ${Math.round(p.size!)}px ${FONT_STACK}`;
+        ? `italic 400 ${Math.round(p.size)}px ${FONT_STACK}`
+        : `700 ${Math.round(p.size)}px ${FONT_STACK}`;
       if (f !== font) { ctx.font = f; font = f; }
-      ctx.globalAlpha = p.kind === 'word' ? a * 0.8 : a;
-      // Letters snap to the dither grid so they stay 1-bit crisp.
-      const x = p.kind === 'word' ? Math.round(p.x) : Math.round(p.x / cell) * cell;
-      const y = p.kind === 'word' ? Math.round(p.y) : Math.round(p.y / cell) * cell;
-      ctx.fillText(p.s!, x, y);
+      ctx.globalAlpha = p.kind === 'word' ? a * 0.85 : a;
+      ctx.fillText(p.s, Math.round(p.x), Math.round(p.y));
     }
     for (let b = 0; b < 4; b++) {
-      if (!buckets[b].length) continue;
       ctx.globalAlpha = (b + 1) / 4;
-      ctx.beginPath();
-      for (const p of buckets[b]) {
-        const sp = Math.hypot(p.vx, p.vy) || 1;
-        const x = Math.round(p.x / cell) * cell, y = Math.round(p.y / cell) * cell;
-        ctx.moveTo(x, y);
-        ctx.lineTo(x - (p.vx / sp) * p.len!, y - (p.vy / sp) * p.len!);
+      if (dashes[b].length) {
+        ctx.beginPath();
+        for (const p of dashes[b]) {
+          const sp = Math.hypot(p.vx, p.vy) || 1;
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x - (p.vx / sp) * p.len, p.y - (p.vy / sp) * p.len);
+        }
+        ctx.stroke();
       }
-      ctx.stroke();
+      if (dots[b].length) {
+        const s = Math.max(1, Math.round(1.5 * dpr));
+        for (const p of dots[b]) ctx.fillRect(Math.round(p.x), Math.round(p.y), s, s);
+      }
     }
     ctx.globalAlpha = 1;
+  }
+
+  function spawnFor(dt: number, front: number, sinceBreak: number) {
+    if (sinceBreak < 0) return;
+    const growing = sinceBreak < BREAK_GROW_S;
+    const rate = (narrow ? 0.45 : 1) * (growing ? 1300 : 650); // particles per second
+    emitAcc += dt * rate;
+    while (emitAcc >= 1) {
+      const r = rng();
+      emit(front, r < 0.62 ? 'dash' : r < 0.86 ? 'dot' : 'char');
+      emitAcc--;
+    }
+    wordAcc += dt * 1.1;
+    while (wordAcc >= 1) { emit(front, 'word'); wordAcc--; }
   }
 
   function frame(ts: number) {
@@ -373,38 +459,38 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
     if (!running || !visible) return;
     const dt = Math.min(0.05, (ts - (lastT || ts)) / 1000);
     lastT = ts;
-    const el = (ts - startT) / 1000;
-    const ramp = smooth(1.0, 4.5, el); // the breakaway builds, then holds
-    paintDither(ts, smooth(0, 1.6, el), ramp * 0.45);
-    if (el > 1.0) {
-      spawnAcc += dt * (narrow ? 50 : 110) * ramp;
-      while (spawnAcc >= 1) { spawn(ts, Math.random() < 0.72 ? 'dash' : 'char'); spawnAcc--; }
-      wordAcc += dt * 1.2 * ramp;
-      while (wordAcc >= 1) { spawn(ts, 'word'); wordAcc--; }
-    }
-    drawParticles(dt);
+    const t = (ts - startT) / 1000;
+    const sinceBreak = breakT < 0 ? -1 : (ts - breakT) / 1000;
+    const front = frontAt(sinceBreak);
+    // fade in: faint first, then full contrast
+    const gain = 0.35 * smooth(0.1, 0.6, t) + 0.65 * smooth(0.6, 1.6, t);
+    spawnFor(dt, front, sinceBreak);
+    step(dt, t);
+    paint(gain, front, (ts / 70) | 0);
+    drawParticles();
     raf = requestAnimationFrame(frame);
   }
 
-  // Still frame for reduced motion: full portrait, crown partly broken, a frozen stream.
+  function startBreak() {
+    if (breakT < 0) breakT = performance.now();
+  }
+
+  // Still frame for reduced motion: the break at full size and a settled stream,
+  // simulated with a fixed seed so it looks the same on every visit.
   function drawSettled() {
     if (!ready) return;
     particles = [];
-    holes.fill(0);
-    let seed = 11;
-    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    for (let k = 0; k < 140; k++) {
-      spawn(0, k % 35 === 0 ? 'word' : k % 3 === 0 ? 'char' : 'dash', rnd);
-      const p = particles.at(-1);
-      if (p) {
-        p.age = rnd() * p.life * 0.75;
-        p.x += p.vx * p.age;
-        p.y += p.vy * p.age - 3 * dpr * p.age * p.age;
-      }
+    let seed = 7;
+    rng = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const dt = 1 / 30;
+    for (let s = 0; s < 150; s++) {
+      const since = BREAK_GROW_S + s * dt;
+      spawnFor(dt, frontAt(since), since);
+      step(dt, s * dt);
     }
-    holes.fill(0);
-    paintDither(1e9, 1, 0.35);
-    drawParticles(0);
+    rng = Math.random;
+    paint(1, frontAt(BREAK_GROW_S), 1);
+    drawParticles();
     particles = [];
   }
 
@@ -413,8 +499,7 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
     if (reduced) { stop(); drawSettled(); return; }
     running = true;
     startT = performance.now(); lastT = 0;
-    particles = []; spawnAcc = 0; wordAcc = 0;
-    holes.fill(0);
+    particles = []; emitAcc = 0; wordAcc = 0;
     if (!raf) raf = requestAnimationFrame(frame);
   }
   function stop() {
@@ -443,8 +528,8 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
     root.classList.toggle('rr-anim', !reduced);
     clearTimers();
     cancelAnimationFrame(sweepRaf);
-    if (reduced) { stop(); settleHeadline(); drawSettled(); }
-    else { playHeadline(); start(); }
+    if (reduced) { stop(); settleText(); drawSettled(); }
+    else { playText(); start(); }
   };
   mq.addEventListener('change', onMotionPref);
 
@@ -459,8 +544,13 @@ export function mountReadingRoomHero(root: HTMLElement, cfg: HeroConfig): () => 
   keys.forEach((k) => k.addEventListener('keydown', onKey));
 
   buildHeadline();
+  buildLede();
   root.classList.remove('rr-pending');
-  document.fonts.ready.then(() => (reduced ? settleHeadline() : playHeadline()));
+  // Text waits for fonts so the cursor lands on real glyph positions.
+  let textStarted = false;
+  const startText = () => { if (textStarted) return; textStarted = true; reduced ? settleText() : playText(); };
+  document.fonts.ready.then(startText);
+  later(startText, 1500); // don't hold the page if a font is slow
   img.onload = () => {
     layout();
     document.fonts.load(`16px ${FONT_STACK}`).finally(start);

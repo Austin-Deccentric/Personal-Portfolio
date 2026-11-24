@@ -24,7 +24,7 @@ const HEADLINE: HeadlineSegment[] = [
 // Small words that lift off with the stream.
 const WORDS = ['riders', 'ledger', 'keke', 'voice note', 'Pidgin', 'receipt', 'shops', 'Enugu', 'draft', 'route', 'idempotent', 'approve', 'Igbo', 'async'];
 
-const DITHER_CELL = 3; // dither pixel size in CSS px
+const DITHER_CELL = 1.5; // stipple dot size in CSS px
 const INK: [number, number, number] = [0x12, 0x35, 0x5b]; // deep blue
 // ────────────────────────────────────────────────────────────────────────────
 
@@ -33,9 +33,18 @@ const config = JSON.stringify({ portraitSrc: PORTRAIT_SRC, headline: HEADLINE, w
 ---
 
 <section class="rr-hero rr-pending relative overflow-hidden" aria-labelledby="hero-title" data-rr-hero data-config={config}>
-  <div class="container grid grid-cols-1 hero:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] hero:min-h-[min(700px,calc(100svh_-_184px))]">
-    <div class="relative z-2 flex min-w-0 flex-col justify-center gap-[22px] pt-1 pb-9 hero:gap-[26px] hero:pt-8 hero:pb-12">
-      <h1 id="hero-title" class="m-0 text-[clamp(44px,5.8vw,84px)] leading-[0.95] font-extrabold tracking-[-0.045em] text-ink">
+  <!-- Portrait: full-bleed on the right on desktop, a band above the copy on phones. -->
+  <div class="relative h-[min(62vh,460px)] hero:absolute hero:inset-y-0 hero:right-0 hero:left-[40%] hero:h-auto" data-stage>
+    <canvas class="pointer-events-none absolute inset-0 block h-full w-full" aria-hidden="true" data-canvas></canvas>
+    <span class="sr-only">Portrait of Augustine Chukwu drawn in fine dots. The top of his head breaks away into dashes and letters that drift up and to the right.</span>
+    <span class="rr-sticker sticker absolute right-4 bottom-6 z-2 hero:right-auto hero:bottom-auto hero:left-[6%] hero:top-[74%]" data-reveal>
+      Co-founder · KekeVest
+    </span>
+  </div>
+
+  <div class="container relative z-2 hero:flex hero:min-h-[min(760px,calc(100svh_-_136px))] hero:items-center">
+    <div class="flex max-w-[600px] min-w-0 flex-col gap-[22px] pt-2 pb-9 hero:gap-7 hero:py-14">
+      <h1 id="hero-title" class="m-0 text-[clamp(44px,5.6vw,84px)] leading-[0.95] font-extrabold tracking-[-0.045em] text-ink">
         <span class="sr-only">{plainHeadline}</span>
         <span class="relative block" aria-hidden="true" data-typed>
           {
@@ -52,7 +61,7 @@ const config = JSON.stringify({ portraitSrc: PORTRAIT_SRC, headline: HEADLINE, w
         </span>
       </h1>
 
-      <p class="m-0 max-w-[36ch] text-[clamp(18px,1.5vw,20px)] leading-[1.55] text-text" data-reveal>
+      <p class="m-0 max-w-[36ch] text-[clamp(18px,1.5vw,20px)] leading-[1.55] text-text" data-type-lede>
         I'm Augustine (Austin). I build backend and AI systems for the shops, riders and small businesses big tech drives past.
       </p>
 
@@ -60,14 +69,6 @@ const config = JSON.stringify({ portraitSrc: PORTRAIT_SRC, headline: HEADLINE, w
         <a href="#work" class="btn btn-primary key">See the route</a>
         <a href="/contact" class="btn btn-link">Get in touch</a>
       </div>
-    </div>
-
-    <div class="relative order-first h-[min(56vh,400px)] min-w-0 hero:order-none hero:h-auto" data-stage>
-      <canvas class="absolute inset-0 block h-full w-full" aria-hidden="true" data-canvas></canvas>
-      <span class="sr-only">Portrait of Augustine Chukwu drawn in dots, with letters and dashes drifting up from his head.</span>
-      <span class="rr-sticker sticker absolute right-1 bottom-9 z-2 hero:right-auto hero:bottom-auto hero:left-0 hero:top-[68%]" data-reveal>
-        Co-founder · KekeVest
-      </span>
     </div>
   </div>
 
@@ -102,8 +103,9 @@ const config = JSON.stringify({ portraitSrc: PORTRAIT_SRC, headline: HEADLINE, w
     font-weight: 500;
     letter-spacing: -0.02em;
   }
-  .rr-pending [data-typed] { visibility: hidden; }
+  .rr-pending [data-typed], .rr-pending [data-type-lede] { visibility: hidden; }
   .rr-anim .rr-c { visibility: hidden; }
+  .rr-hero [data-type-lede] .rr-w { white-space: nowrap; }
   .rr-anim .rr-c.on { visibility: visible; }
 
   .rr-hero .rr-strike { position: relative; display: inline-block; transition: color 0.4s ease, opacity 0.4s ease; }
