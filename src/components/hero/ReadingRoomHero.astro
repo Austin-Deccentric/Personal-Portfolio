@@ -6,11 +6,8 @@ import '../../styles/hero.css';
 import type { HeadlineSegment } from './reading-room';
 
 // ─── Swap these ─────────────────────────────────────────────────────────────
-// Portrait: a PNG/WebP with a transparent background dithers cleanly; a photo
-// with a background still works but the background turns into dots too.
-// Make a cutout from a new full-resolution photo with any background remover,
-// save it to public/hero/, and point this at it.
-const PORTRAIT_SRC = '/hero/portrait-cutout.webp';
+// Portrait: shown in black and white on the right (on top on phones), as on the original site.
+const PORTRAIT_SRC = '/photo.jpg';
 
 // Typed in order. `strike` is typed, then crossed out by the cursor.
 const HEADLINE: HeadlineSegment[] = [
@@ -20,29 +17,20 @@ const HEADLINE: HeadlineSegment[] = [
   { text: 'people', accent: true },
   { text: ' actually go.' },
 ];
-
-// Small words that lift off with the stream.
-const WORDS = ['riders', 'ledger', 'keke', 'voice note', 'Pidgin', 'receipt', 'shops', 'Enugu', 'draft', 'route', 'idempotent', 'approve', 'Igbo', 'async'];
-
-const DITHER_CELL = 1.5; // stipple dot size in CSS px
-const INK: [number, number, number] = [0x12, 0x35, 0x5b]; // deep blue
 // ────────────────────────────────────────────────────────────────────────────
 
 const plainHeadline = HEADLINE.filter((s) => !s.strike).map((s) => s.text).join('').replace(/\s+/g, ' ');
-const config = JSON.stringify({ portraitSrc: PORTRAIT_SRC, headline: HEADLINE, words: WORDS, cell: DITHER_CELL, ink: INK });
+const config = JSON.stringify({ headline: HEADLINE });
 ---
 
 <section class="rr-hero rr-pending relative overflow-hidden" aria-labelledby="hero-title" data-rr-hero data-config={config}>
-  <!-- Portrait: full-bleed on the right on desktop. On phones it sits behind the top of the
-       hero and fades out before the headline (the site's original phone pattern), so the
+  <!-- Portrait, as on the original site: black and white on the right, fading in from the
+       left on desktop; on phones it sits on top and fades out before the headline, so the
        headline, subcopy and buttons stay in the first screen. -->
-  <div class="rr-stage absolute inset-x-0 top-0 h-[400px] hero:inset-y-0 hero:right-0 hero:left-[40%] hero:h-auto" data-stage>
-    <canvas class="pointer-events-none absolute inset-0 block h-full w-full" aria-hidden="true" data-canvas></canvas>
-    <span class="sr-only">Portrait of Augustine Chukwu drawn in fine dots. The top of his head breaks away into dashes and letters that drift up and to the right.</span>
-    <span class="rr-sticker sticker absolute right-2 top-[60%] z-2 hero:right-auto hero:bottom-auto hero:left-[6%] hero:top-[74%]" data-reveal>
-      Co-founder · KekeVest
-    </span>
+  <div class="rr-photo">
+    <img src={PORTRAIT_SRC} width="900" height="1125" alt="Augustine Chukwu" fetchpriority="high" />
   </div>
+  <span class="rr-sticker sticker absolute z-2" data-reveal>Co-founder · KekeVest</span>
 
   <div class="container relative z-2 hero:flex hero:min-h-[min(760px,calc(100svh_-_136px))] hero:items-center">
     <div class="flex max-w-[600px] min-w-0 flex-col gap-[22px] pt-[292px] pb-9 hero:gap-7 hero:py-14">
@@ -96,6 +84,27 @@ const config = JSON.stringify({ portraitSrc: PORTRAIT_SRC, headline: HEADLINE, w
 </script>
 
 <style is:global>
+  /* Portrait: the original site's treatment. */
+  .rr-hero .rr-photo {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: var(--road-h);
+    width: min(620px, 50%);
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.85) 48%, #000 70%);
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.85) 48%, #000 70%);
+  }
+  .rr-hero .rr-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 18%;
+    filter: grayscale(1) contrast(1.15) brightness(1.05);
+    mix-blend-mode: multiply;
+  }
+  .rr-hero .rr-sticker { right: 96px; top: 24px; }
+
   /* Parts the script builds at runtime, plus states Tailwind can't express cleanly. */
   .rr-hero .rr-w { white-space: nowrap; }
   .rr-hero .rr-accent {
@@ -144,10 +153,14 @@ const config = JSON.stringify({ portraitSrc: PORTRAIT_SRC, headline: HEADLINE, w
   .rr-anim [data-reveal].on { opacity: 1; translate: none; }
 
   @media (max-width: 899.98px) {
-    .rr-hero .rr-stage {
-      -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 55%, transparent 80%);
-      mask-image: linear-gradient(to bottom, #000 0, #000 55%, transparent 80%);
+    .rr-hero .rr-photo {
+      bottom: auto;
+      width: 100%;
+      height: 380px;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 64px, #000 30%, transparent 76%);
+      mask-image: linear-gradient(to bottom, transparent 0, #000 64px, #000 30%, transparent 76%);
     }
+    .rr-hero .rr-sticker { right: 16px; top: 16px; }
     .rr-hero .rr-sticker { font-size: 12px; padding: 8px 12px; }
   }
 
