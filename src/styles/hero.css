@@ -1,0 +1,20 @@
+/* Tailwind for the homepage hero only.
+   - No preflight, so the rest of the site keeps its own base styles.
+   - Utilities are unlayered (so a class beats global element rules like `h1 {}`)
+     and only generated for classes used in src/components/hero. */
+@import 'tailwindcss/theme' layer(theme);
+@import 'tailwindcss/utilities' source(none);
+@source '../components/hero';
+/* The site has its own .container; don't let Tailwind generate one. */
+@source not inline('container');
+
+@theme {
+  --color-paper: #faf6ef;
+  --color-ink: #12355b;
+  --color-ink-edge: #071a30;
+  --color-text: #1b2430;
+  --color-muted: #4a5568;
+  --color-terracotta: #b5532f;
+  --font-courier: 'Courier Prime', 'Courier New', Courier, monospace;
+  --breakpoint-hero: 56.25rem; /* 900px: two columns from here up */
+}

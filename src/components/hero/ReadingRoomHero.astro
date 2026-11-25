@@ -1,0 +1,192 @@
+---
+// Homepage hero: typed headline with a cursor-drawn strikethrough, and a 1-bit
+// dithered portrait whose head breaks away into drifting letters and dashes.
+// Motion lives in ./reading-room.ts; visitors who prefer reduced motion get a still frame.
+import '../../styles/hero.css';
+import type { HeadlineSegment } from './reading-room';
+
+// ─── Swap these ─────────────────────────────────────────────────────────────
+// Portrait: shown in black and white on the right (on top on phones), as on the original site.
+const PORTRAIT_SRC = '/photo.jpg';
+
+// Typed in order. `strike` is typed, then crossed out by the cursor.
+const HEADLINE: HeadlineSegment[] = [
+  { text: 'Software that goes where ' },
+  { text: 'you', strike: true },
+  { text: ' ' },
+  { text: 'people', accent: true },
+  { text: ' actually go.' },
+];
+// ────────────────────────────────────────────────────────────────────────────
+
+const plainHeadline = HEADLINE.filter((s) => !s.strike).map((s) => s.text).join('').replace(/\s+/g, ' ');
+const config = JSON.stringify({ headline: HEADLINE });
+---
+
+<section class="rr-hero rr-pending relative overflow-hidden" aria-labelledby="hero-title" data-rr-hero data-config={config}>
+  <!-- Portrait, as on the original site: black and white on the right, fading in from the
+       left on desktop; on phones it sits on top and fades out before the headline, so the
+       headline, subcopy and buttons stay in the first screen. -->
+  <div class="rr-photo">
+    <img src={PORTRAIT_SRC} width="900" height="1125" alt="Augustine Chukwu" fetchpriority="high" />
+  </div>
+  <span class="rr-sticker sticker absolute z-2" data-reveal>Co-founder · KekeVest</span>
+
+  <div class="container relative z-2 hero:flex hero:min-h-[min(760px,calc(100svh_-_136px))] hero:items-center">
+    <div class="flex max-w-[600px] min-w-0 flex-col gap-[22px] pt-[292px] pb-9 hero:gap-7 hero:py-14">
+      <h1 id="hero-title" class="m-0 text-[clamp(44px,5.6vw,84px)] leading-[0.95] font-extrabold tracking-[-0.045em] text-ink">
+        <span class="sr-only">{plainHeadline}</span>
+        <span class="relative block" aria-hidden="true" data-typed>
+          {
+            HEADLINE.map((s) =>
+              s.strike ? (
+                <span class="rr-strike struck">{s.text}<span class="rr-line" /></span>
+              ) : s.accent ? (
+                <span class="rr-accent">{s.text}</span>
+              ) : (
+                s.text
+              ),
+            )
+          }
+        </span>
+      </h1>
+
+      <p class="m-0 max-w-[36ch] text-[clamp(18px,1.5vw,20px)] leading-[1.55] text-text" data-type-lede>
+        I'm Augustine (Austin). I build backend and AI systems for the shops, riders and small businesses big tech drives past.
+      </p>
+
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-3" data-reveal>
+        <a href="#work" class="btn btn-primary key">See the route</a>
+        <a href="/contact" class="btn btn-link">Get in touch</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container relative z-2" data-reveal>
+    <p class="m-0 pb-3.5 font-courier text-[13px] tracking-[0.1em] text-muted uppercase">
+      <strong class="font-bold text-ink">Software engineer</strong> · Co-founder, KekeVest
+    </p>
+  </div>
+  <div class="road" aria-hidden="true"></div>
+</section>
+
+<script is:inline>
+  // Runs before first paint. With motion allowed, hide the headline until the
+  // script rebuilds it letter by letter; no-JS and reduced-motion visitors
+  // keep the finished headline from the HTML.
+  (function () {
+    var hero = document.currentScript.previousElementSibling;
+    try {
+      if (hero && !matchMedia('(prefers-reduced-motion: reduce)').matches) hero.classList.add('rr-anim');
+      else if (hero) hero.classList.remove('rr-pending');
+    } catch (e) { hero && hero.classList.remove('rr-pending'); }
+  })();
+</script>
+
+<style is:global>
+  /* Portrait: the original site's treatment. */
+  .rr-hero .rr-photo {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: var(--road-h);
+    width: min(620px, 50%);
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.85) 48%, #000 70%);
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.85) 48%, #000 70%);
+  }
+  .rr-hero .rr-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 18%;
+    filter: grayscale(1) contrast(1.15) brightness(1.05);
+    mix-blend-mode: multiply;
+  }
+  .rr-hero .rr-sticker { right: 96px; top: 24px; }
+
+  /* Parts the script builds at runtime, plus states Tailwind can't express cleanly. */
+  .rr-hero .rr-w { white-space: nowrap; }
+  .rr-hero .rr-accent {
+    color: var(--accent);
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .rr-pending [data-typed], .rr-pending [data-type-lede] { visibility: hidden; }
+  .rr-anim .rr-c { visibility: hidden; }
+  .rr-hero [data-type-lede] .rr-w { white-space: nowrap; }
+  .rr-anim .rr-c.on { visibility: visible; }
+
+  .rr-hero .rr-strike { position: relative; display: inline-block; transition: color 0.4s ease, opacity 0.4s ease; }
+  .rr-hero .rr-line {
+    position: absolute;
+    left: -0.04em;
+    top: 55%;
+    width: calc(100% + 0.08em);
+    height: 0.07em;
+    background: var(--blue);
+    transform-origin: left center;
+  }
+  .rr-hero .rr-strike.struck { color: var(--muted); opacity: 0.7; }
+  .rr-anim .rr-strike:not(.struck) .rr-line { transform: scaleX(var(--p, 0)); }
+
+  .rr-hero .rr-cursor {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0.5em;
+    height: 0.74em;
+    background: var(--blue);
+    pointer-events: none;
+  }
+  .rr-hero .rr-cursor.blink { animation: rr-blink 1.06s steps(1, end) infinite; }
+  @keyframes rr-blink { 50% { opacity: 0; } }
+
+  /* Copy, buttons and sticker fade up once the headline is typed. */
+  .rr-anim [data-reveal] {
+    opacity: 0;
+    translate: 0 10px;
+    transition: opacity 0.6s ease, translate 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .rr-anim [data-reveal].on { opacity: 1; translate: none; }
+
+  @media (max-width: 899.98px) {
+    .rr-hero .rr-photo {
+      bottom: auto;
+      width: 100%;
+      height: 380px;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 64px, #000 30%, transparent 76%);
+      mask-image: linear-gradient(to bottom, transparent 0, #000 64px, #000 30%, transparent 76%);
+    }
+    .rr-hero .rr-sticker { right: 16px; top: 16px; }
+    .rr-hero .rr-sticker { font-size: 12px; padding: 8px 12px; }
+  }
+
+</style>
+
+<script>
+  import { mountReadingRoomHero, type HeroConfig } from './reading-room';
+
+  let cleanup: (() => void) | undefined;
+
+  function mount() {
+    cleanup?.();
+    const root = document.querySelector<HTMLElement>('[data-rr-hero]');
+    if (!root) return;
+    const cfg = JSON.parse(root.dataset.config!) as HeroConfig;
+    cleanup = mountReadingRoomHero(root, cfg);
+  }
+
+  function unmount() {
+    cleanup?.();
+    cleanup = undefined;
+  }
+
+  mount();
+  // Works with or without Astro's client router.
+  document.addEventListener('astro:after-swap', mount);
+  document.addEventListener('astro:before-swap', unmount);
+  window.addEventListener('pagehide', unmount);
+</script>
