@@ -26,7 +26,7 @@
   ],
   "highlights": [
     "~6,100 LOC FastAPI backend and ~6,400 LOC Next.js + TypeScript frontend",
-    "166 pytest tests against real Postgres plus 30 Playwright end-to-end tests with axe accessibility checks",
+    "183 pytest tests against real Postgres plus 35 Playwright end-to-end tests with axe accessibility checks",
     "Idempotent, resumable 4-step pipeline: transcribe → translate → tag intent → draft reply",
     "Approval gate: sending a reply without an approval record is rejected with HTTP 409",
     "Postgres job queue with SELECT … FOR UPDATE SKIP LOCKED instead of Redis",

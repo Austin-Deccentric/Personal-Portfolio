@@ -13,7 +13,7 @@
   "stack": ["Python 3.14", "FastAPI", "SQLModel", "PostgreSQL", "Redis", "Alembic", "Docker", "SlowAPI", "APScheduler", "SSE"],
   "highlights": [
     "2,814 LOC across domain modules: rooms, bookings, payments, users, auth",
-    "102 automated tests across 13 test files",
+    "100 automated tests across 13 test files",
     "4-role RBAC (guest, receptionist, housekeeper, manager) via reusable dependencies",
     "Pessimistic locking to prevent double-bookings",
     "Server-side price calculation — client never trusted for totals",

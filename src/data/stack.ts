@@ -27,8 +27,13 @@ export const stackGroups: StackGroup[] = [
     items: ['pytest', 'Playwright', 'axe-core', 'Ruff', 'basedpyright', 'ESLint'],
   },
   {
+    name: 'AI',
+    desc: 'Shipped in VoiceDesk',
+    items: ['LLM integration (OpenAI-compatible)', 'Speech-to-text (ElevenLabs Scribe v2)', 'Provider-agnostic adapters', 'Knowledge-base-grounded drafting', 'Human approval gate'],
+  },
+  {
     name: 'Learning',
     desc: "Where I'm growing next",
-    items: ['Data pipelines', 'Cloud infra', 'Agentic AI', 'LLMs'],
+    items: ['Data pipelines', 'Cloud infra', 'Agentic AI'],
   },
 ];
